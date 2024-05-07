@@ -55,8 +55,5 @@
         DocumentTypes = await _documentTypeService.GetDocumentTypes();
     }
 
-    public void RowSelected(DocumentType documentType)
-    {
-        MudDialog.Close(DialogResult.Ok(documentType));
-    }
+    public void RowSelected(DocumentType documentType) => MudDialog.Close(DialogResult.Ok(documentType));
 }

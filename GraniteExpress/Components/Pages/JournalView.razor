@@ -103,8 +103,6 @@
 </MudGrid>
 
 
-
-
 @code{
     List<Models.JournalView> JournalViews {get;set;} = new();
     DialogOptions _dialogOption = new DialogOptions() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true, DisableBackdropClick = true, CloseButton = true };
@@ -137,7 +135,6 @@
         {
             try
             {
-                // var template = result.Data as Template;
                 JournalViews = await _journalService.GetJournalViews();
                 StateHasChanged();
             }
@@ -146,7 +143,6 @@
                 _snakBar.Add("Journal addtion failed.", Severity.Error);
             }
         }
-        StateHasChanged();
     }
 
     public async Task EditJournal(Models.JournalView journalView){
@@ -169,7 +165,6 @@
                 _snakBar.Add("Journal addtion failed.", Severity.Error);
             }
         }
-        StateHasChanged();
     }
 
     public async Task DeleteJournal(Models.JournalView journalView){
@@ -190,6 +185,5 @@
                 _snakBar.Add("Journal deletion failed.", Severity.Error);
             }
         }
-        StateHasChanged();
     }
 }

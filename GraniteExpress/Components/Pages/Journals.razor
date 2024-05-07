@@ -1,5 +1,4 @@
 ﻿@page "/transaction"
-@using GraniteExpress.Components.Dialogs
 @inject IJournalService _journalService
 @inject IAccountService _AccountService
 @inject ICurrencyService _currencyService
@@ -34,27 +33,15 @@
             </MudGrid>
             <MudGrid>
                 <MudItem xs="4" @onclick=@(() => OpenDocumentTypeSelectDialog())>
-                    @*                     <MudSelect Variant="Variant.Outlined" T="int" @bind-Value="Journal.DocumentTypeId" Label="Document Type" Margin="Margin.Dense">
-                    @foreach (var type in DocumentTypes)
-                    {
-                    <MudSelectItem T="int" Value="@type.DocumentTypeId">@type.DocumentName</MudSelectItem>
-                    }
-                    </MudSelect> *@
                     @{
                         var documentType = DocumentTypes.Where(x => x.DocumentTypeId == Journal.DocumentTypeId).FirstOrDefault();
                         <MudTextField Error="@documentTypeError" ErrorText="Document Type is required" Label="Select Document Type" Variant=Variant.Outlined Value="@(documentType is not null ? documentType.DocumentName : null)" ReadOnly Margin="Margin.Dense"></MudTextField>
                     }
                 </MudItem>
                 <MudItem xs="4" @onclick=@(() => OpenTemplateSelectDialog())>
-                    @*                     <MudSelect Variant="Variant.Outlined" T="int?" SelectedValuesChanged="OnSelectedValuesChanged" @bind-Value="Journal.TemplateId" Label="Template" Margin="Margin.Dense">
-                    @foreach (var type in Templates)
-                    {
-                    <MudSelectItem T="int?" Value="@type.TemplateId">@type.TemplateName</MudSelectItem>
-                    }
-                    </MudSelect> *@
                     @{
                         var template = Templates.Where(x => x.TemplateId == Journal.TemplateId).FirstOrDefault();
-                        <MudTextField Error="@templateError" ErrorText="Template is required" Label="Select Template" Variant=Variant.Outlined Value="@(template is not null ? template.TemplateName : null )" ReadOnly Margin="Margin.Dense"></MudTextField>
+                        <MudTextField Label="Select Template" Variant=Variant.Outlined Value="@(template is not null ? template.TemplateName : null )" ReadOnly Margin="Margin.Dense"></MudTextField>
                     }
                 </MudItem>
                 <MudItem xs="4" Style="min-height:40px;" @onclick=@(() => OpenJournalClientSelectDialog())>
@@ -82,32 +69,6 @@
                 <MudTh>Credit Amount</MudTh>
                 <MudTh>Cash Flow</MudTh>
             </HeaderContent>
-            @* <RowTemplate>
-            <MudTd DataLabel="Account">
-            @{
-            var account = Accounts.Where(x => x.AccountId == context.AccountId).FirstOrDefault();
-            <MudText> @(account is not null ? $"{account.AccountName} - {account.AccountCode}" : "") </MudText>
-            }
-            </MudTd>
-            <MudTd DataLabel="Currency">
-            @{
-            var currency = Currencies.Where(x => x.CurrencyId == context.CurrencyId).FirstOrDefault();
-            <MudText> @(currency is not null ? currency.CurrencyCode : "") </MudText>
-            }
-            </MudTd>
-            <MudTd DataLabel="Exchange Rate">
-            @context.ExchangeRate
-            </MudTd>
-            <MudTd DataLabel="Debit">
-            @context.IsDebit.ToString()
-            </MudTd>
-            <MudTd DataLabel="Cash Flow">
-
-            </MudTd>
-            <MudTd DataLabel="Client">
-
-            </MudTd>
-            </RowTemplate> *@
             <RowTemplate>
                 <MudTd>
                     <MudItem>
@@ -118,7 +79,7 @@
                     </MudItem>
                 </MudTd>
                 <MudTd DataLabel="Account Code">
-                    <MudItem Style="min-height:40px;" @onclick=@(() => OpenAccountSelectDialog(context)) @onkeydown=@((e) => OnEnterOpenAccountDialog(context,e))>
+                    <MudItem Style="min-height:40px;" @onclick=@(() => OpenAccountSelectDialog(context))>
                         @{
                             var account = Accounts.Where(x => x.AccountId == context.AccountId).FirstOrDefault();
                             <MudTextField Value="@(account is not null ? account.AccountCode: " ")" ReadOnly Margin="Margin.Dense"></MudTextField>
@@ -154,7 +115,7 @@
                     </MudItem>
                 </MudTd>
                 <MudTd DataLabel="Client Code">
-                    <MudItem Style="min-height:40px;" @onclick=@(() => OpenClientSelectDialog(context)) @onkeydown=@((e) => OnEnterOpenClientDialog(e))>
+                    <MudItem Style="min-height:40px;" @onclick=@(() => OpenClientSelectDialog(context))>
                         @{
                             var client = Clients.Where(x => x.ClientId == context.ClientId).FirstOrDefault();
                             <MudTextField Value="@(client is not null ? client.ClientCode : " ")" ReadOnly Margin="Margin.Dense"></MudTextField>
@@ -191,7 +152,6 @@
                                 <MudTextField Value=@(" ") ReadOnly Margin="Margin.Dense"></MudTextField>
                             }
                         }
-                        @* <MudTextField Style="border: none !important;" @bind-Value="@context.ExchangeRate" Margin="Margin.Dense" For="(() => context.ExchangeRate)"></MudTextField> *@
                     </MudItem>
                 </MudTd>
                 <MudTd DataLabel="Currency Amount">
@@ -260,10 +220,6 @@
     .mud-input.mud-input-underline:hover:not(.mud-disabled)::before {
         border-bottom: none;
     }
-
-    /*     .mud-table-row td:last-child, .mud-table-row th:last-child {
-            display: none;
-        } */
 </style>
 
 @code {
@@ -282,7 +238,6 @@
     MudTable<JournalDetail> JournalDetailTable = new();
     public DateTime? journalDate = DateTime.UtcNow;
     bool clientError = false;
-    bool templateError = false;
     bool documentTypeError = false;
 
     protected override async Task OnInitializedAsync()
@@ -315,14 +270,9 @@
         if (isValid)
         {
             clientError = Journal.ClientId == 0;
-            // templateError = Journal.TemplateId == null;
             documentTypeError = Journal.DocumentTypeId == 0;
 
-            if (clientError || documentTypeError)
-            {
-
-            }
-            else
+            if (!(clientError || documentTypeError))
             {
                 var debitAmount = Journal.JournalDetail.Where(x => x.IsDebit == true).Sum(s => s.CurrencyAmount * s.ExchangeRate);
                 var creditAmount = Journal.JournalDetail.Where(x => x.IsDebit == false).Sum(s => s.CurrencyAmount * s.ExchangeRate);
@@ -341,36 +291,11 @@
                 else
                 {
                     _snakBar.Add("Debit and Credit amount are not equal.", Severity.Error);
-
                 }
             }
         }
         Journal.JournalDetail.Add(lastJournal);
     }
-
-    // private void ChangeRow(object element)
-    // {
-    //     _snakBar.Add("row changed", Severity.Success);
-    //     if(((JournalDetail)element) == Journal.JournalDetail.Last())
-    //     {
-    //         Journal.JournalDetail.Add(new());
-    //     }
-    //     StateHasChanged();
-    // }
-
-    // private void AddRow(JournalDetail journalDetail)
-    // {
-    //     _snakBar.Add("row changed", Severity.Success);
-    //     if (journalDetail == Journal.JournalDetail.Last())
-    //     {
-    //         Journal.JournalDetail.Add(new());
-    //     }
-    //     StateHasChanged();
-    // }
-    // private void ItemHasBeenCommitted(object element)
-    // {
-    //     AddEditionEvent($"RowEditCommit event: Changes to Element {((Element)element).Name} committed");
-    // }
 
     private async Task OpenAccountSelectDialog(JournalDetail journalDetail)
     {
@@ -391,42 +316,42 @@
 
     }
 
-    private async Task OnEnterOpenAccountDialog(JournalDetail journalDetail, KeyboardEventArgs e)
-    {
-        if (e.Code == "Enter" || e.Code == "NumpadEnter")
-        {
-            var dialog = _dialog.Show<AccountDialog>("Select Account", _dialogOption);
-            var result = await dialog.Result;
+    // private async Task OnEnterOpenAccountDialog(JournalDetail journalDetail, KeyboardEventArgs e)
+    // {
+    //     if (e.Code == "Enter" || e.Code == "NumpadEnter")
+    //     {
+    //         var dialog = _dialog.Show<AccountDialog>("Select Account", _dialogOption);
+    //         var result = await dialog.Result;
 
-            if (!result.Canceled)
-            {
-                var account = result.Data as Account;
-                JournalDetailTable.SelectedItem.AccountId = account.AccountId;
+    //         if (!result.Canceled)
+    //         {
+    //             var account = result.Data as Account;
+    //             JournalDetailTable.SelectedItem.AccountId = account.AccountId;
 
-                if (journalDetail == Journal.JournalDetail.Last())
-                {
-                    Journal.JournalDetail.Add(new());
-                }
-                StateHasChanged();
-            }
-        }
-    }
+    //             if (journalDetail == Journal.JournalDetail.Last())
+    //             {
+    //                 Journal.JournalDetail.Add(new());
+    //             }
+    //             StateHasChanged();
+    //         }
+    //     }
+    // }
 
-    private async Task OnEnterOpenClientDialog(KeyboardEventArgs e)
-    {
-        if (e.Code == "Enter" || e.Code == "NumpadEnter")
-        {
-            var dialog = _dialog.Show<ClientDialog>("Select Client", _dialogOption);
-            var result = await dialog.Result;
+    // private async Task OnEnterOpenClientDialog(KeyboardEventArgs e)
+    // {
+    //     if (e.Code == "Enter" || e.Code == "NumpadEnter")
+    //     {
+    //         var dialog = _dialog.Show<ClientDialog>("Select Client", _dialogOption);
+    //         var result = await dialog.Result;
 
-            if (!result.Canceled)
-            {
-                var client = result.Data as Client;
-                JournalDetailTable.SelectedItem.ClientId = client.ClientId;
-                StateHasChanged();
-            }
-        }
-    }
+    //         if (!result.Canceled)
+    //         {
+    //             var client = result.Data as Client;
+    //             JournalDetailTable.SelectedItem.ClientId = client.ClientId;
+    //             StateHasChanged();
+    //         }
+    //     }
+    // }
 
     private async Task OpenClientSelectDialog(JournalDetail journalDetail)
     {
@@ -487,22 +412,9 @@
                     IsDebit = x.IsDebit
                 }));
             Journal.JournalDetail.Add(new());
-            templateError = false;
         }
         StateHasChanged();
     }
 
-    private void OnSelectedValuesChanged(IEnumerable<int?> values)
-    {
-        var templateId = values.FirstOrDefault();
-        var template = Templates.Where(x => x.TemplateId == templateId).FirstOrDefault();
-        var lastRow = Journal.JournalDetail.Last();
-        _snakBar.Add("changed", Severity.Info);
-        // lastRow.AccountId = template.TemplateDetail.FirstOrDefault().
-    }
-
-    private void RemoveRow(JournalDetail journalDetail)
-    {
-        Journal.JournalDetail.Remove(journalDetail);
-    }
+    private void RemoveRow(JournalDetail journalDetail) => Journal.JournalDetail.Remove(journalDetail);
 }

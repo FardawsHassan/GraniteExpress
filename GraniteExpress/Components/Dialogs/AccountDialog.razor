@@ -1,7 +1,8 @@
 ﻿@inject IAccountService _accountService
+
 <MudDialog>
     <DialogContent>
-        <MudTable Items="Accounts" @ref=mudtable @bind-SelectedItem="SelectedAccount" Class="mb-5">
+        <MudTable Items="Accounts" @ref=_mudTable Class="mb-5">
             <HeaderContent>
                 <MudTh>Account Name</MudTh>
                 <MudTh>Account Code</MudTh>
@@ -40,10 +41,8 @@
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
 
-    MudTable<Account> mudtable = new();
-
+    MudTable<Account> _mudTable = new();
     List<Account> Accounts = new();
-    Account SelectedAccount = new();
 
     protected override async Task OnInitializedAsync()
     {

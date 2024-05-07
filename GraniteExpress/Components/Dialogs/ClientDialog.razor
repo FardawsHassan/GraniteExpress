@@ -52,13 +52,5 @@
         Clients = await _clientService.GetClients();
     }
 
-    // public void RowSelected(TableRowClickEventArgs<Client> tableRowClickEventArgs)
-    // {
-    //     MudDialog.Close(DialogResult.Ok(tableRowClickEventArgs.Item));
-    // }
-
-    public void RowSelected(Client client)
-    {
-        MudDialog.Close(DialogResult.Ok(client));
-    }
+    public void RowSelected(Client client) => MudDialog.Close(DialogResult.Ok(client));
 }
