@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraniteExpress", "GraniteExpress\GraniteExpress.csproj", "{B936E490-A26D-480D-85B6-7D13EAC3640C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B936E490-A26D-480D-85B6-7D13EAC3640C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B936E490-A26D-480D-85B6-7D13EAC3640C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B936E490-A26D-480D-85B6-7D13EAC3640C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B936E490-A26D-480D-85B6-7D13EAC3640C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {789225B9-5021-4E1B-93A3-89AEAA710704}
+	EndGlobalSection
+EndGlobal

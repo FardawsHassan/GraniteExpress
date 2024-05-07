@@ -1,0 +1,62 @@
+﻿@inject IDocumentService _documentTypeService
+<MudDialog>
+    <DialogContent>
+        <MudTable Items="DocumentTypes" @ref=mudtable @bind-SelectedItem="SelectedDocumentType" Class="mb-5">
+            <HeaderContent>
+                <MudTh>Name</MudTh>
+                <MudTh>Code</MudTh>
+                <MudTh>Max Value</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(@context))>
+                        <MudTextField Value="@context.DocumentName" ReadOnly Margin="Margin.Dense"></MudTextField>
+                    </MudItem>
+                </MudTd>
+                <MudTd>
+                    <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(@context))>
+                        <MudTextField Value="@context.DocumentCode" ReadOnly Margin="Margin.Dense"></MudTextField>
+                    </MudItem>
+                </MudTd>
+                <MudTd>
+                <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(@context))>
+                        <MudTextField Value="@context.DocumentMaxValue" ReadOnly Margin="Margin.Dense"></MudTextField>
+                    </MudItem>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </DialogContent>
+</MudDialog>
+
+<style>
+    .mud-input.mud-input-underline::after {
+        border-bottom: none;
+    }
+
+    .mud-input.mud-input-underline::before {
+        border-bottom: none;
+    }
+
+    .mud-input.mud-input-underline:hover:not(.mud-disabled)::before {
+        border-bottom: none;
+    }
+</style>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    MudTable<DocumentType> mudtable = new();
+
+    List<DocumentType> DocumentTypes = new();
+    DocumentType SelectedDocumentType = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        DocumentTypes = await _documentTypeService.GetDocumentTypes();
+    }
+
+    public void RowSelected(DocumentType documentType)
+    {
+        MudDialog.Close(DialogResult.Ok(documentType));
+    }
+}

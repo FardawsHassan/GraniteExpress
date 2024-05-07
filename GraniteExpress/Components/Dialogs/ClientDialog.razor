@@ -1,0 +1,64 @@
+﻿@inject IClientService _clientService
+<MudDialog>
+    <DialogContent>
+        <MudTable Items="Clients" @ref=mudtable @bind-SelectedItem="SelectedClient" Class="mb-5">
+            <HeaderContent>
+                <MudTh>Client Name</MudTh>
+                <MudTh>Client Code</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(@context))>
+                        <MudTextField Value="@(@context.ClientFirstName+" "+@context.ClientLastName)" ReadOnly Margin="Margin.Dense"></MudTextField>
+
+                        
+                    </MudItem>
+                </MudTd>
+                <MudTd>
+                    <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(@context))>
+                        <MudTextField Value="@context.ClientCode" ReadOnly Margin="Margin.Dense"></MudTextField>
+                    </MudItem>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </DialogContent>
+</MudDialog>
+
+<style>
+    .mud-input.mud-input-underline::after {
+        border-bottom: none;
+    }
+
+    .mud-input.mud-input-underline::before {
+        border-bottom: none;
+    }
+
+    .mud-input.mud-input-underline:hover:not(.mud-disabled)::before {
+        border-bottom: none;
+    }
+</style>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    MudTable<Client> mudtable = new();
+
+    List<Client> Clients = new();
+    Client SelectedClient = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Clients = await _clientService.GetClients();
+    }
+
+    // public void RowSelected(TableRowClickEventArgs<Client> tableRowClickEventArgs)
+    // {
+    //     MudDialog.Close(DialogResult.Ok(tableRowClickEventArgs.Item));
+    // }
+
+    public void RowSelected(Client client)
+    {
+        MudDialog.Close(DialogResult.Ok(client));
+    }
+}

@@ -1,0 +1,517 @@
+﻿@using GraniteExpress.Components.Dialogs
+@inject IJournalService _journalService
+@inject IAccountService _AccountService
+@inject ICurrencyService _currencyService
+@inject IClientService _clientService
+@inject IDocumentService _documentService
+@inject ITemplateService _templateService
+
+<MudDialog>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="12">
+                <MudText Typo="Typo.h4" Class="">Journals</MudText>
+            </MudItem>
+            <MudItem xs="12" Class="mb-4">
+                <EditForm Model="@Journal" OnValidSubmit="@OnValidSubmit">
+                    <DataAnnotationsValidator />
+                    <MudItem Class="mt-4 mb-2 mr-2 d-flex justify-end">
+                        <MudButton Class="form-submit-btn" Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">Save</MudButton>
+                    </MudItem>
+                    <MudGrid>
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="Journal.JournalDescription" Label="Description" Class="mt-4" Lines="3" Variant="Variant.Outlined" For="(() => Journal.JournalDescription)" Margin="Margin.Dense"></MudTextField>
+                        </MudItem>
+                    </MudGrid>
+                    <MudGrid>
+                        <MudItem xs="6">
+                            <MudTextField @bind-Value="Journal.DocumentNo" Label="Document Number" Variant="Variant.Outlined" Margin="Margin.Dense" For="(() => Journal.DocumentNo)"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudDatePicker Color="Color.Secondary" Variant="Variant.Outlined" Rounded="true" Margin="Margin.Dense" PickerVariant="PickerVariant.Inline" AutoClose="true" Label="Document Date" @bind-Date="journalDate" DateFormat="dd.MM.yyyy" Editable="true" Placeholder="Select Date" />
+                        </MudItem>
+                    </MudGrid>
+                    <MudGrid>
+                        <MudItem xs="4" @onclick=@(() => OpenDocumentTypeSelectDialog())>
+                            @*                     <MudSelect Variant="Variant.Outlined" T="int" @bind-Value="Journal.DocumentTypeId" Label="Document Type" Margin="Margin.Dense">
+                            @foreach (var type in DocumentTypes)
+                            {
+                            <MudSelectItem T="int" Value="@type.DocumentTypeId">@type.DocumentName</MudSelectItem>
+                            }
+                            </MudSelect> *@
+                            @{
+                                var documentType = DocumentTypes.Where(x => x.DocumentTypeId == Journal.DocumentTypeId).FirstOrDefault();
+                                <MudTextField Error="@documentTypeError" ErrorText="Document Type is required" Label="Select Document Type" Variant=Variant.Outlined Value="@(documentType is not null ? documentType.DocumentName : null)" ReadOnly Margin="Margin.Dense"></MudTextField>
+                            }
+                        </MudItem>
+                        <MudItem xs="4" @onclick=@(() => OpenTemplateSelectDialog())>
+                            @*                     <MudSelect Variant="Variant.Outlined" T="int?" SelectedValuesChanged="OnSelectedValuesChanged" @bind-Value="Journal.TemplateId" Label="Template" Margin="Margin.Dense">
+                            @foreach (var type in Templates)
+                            {
+                            <MudSelectItem T="int?" Value="@type.TemplateId">@type.TemplateName</MudSelectItem>
+                            }
+                            </MudSelect> *@
+                            @{
+                                var template = Templates.Where(x => x.TemplateId == Journal.TemplateId).FirstOrDefault();
+                                <MudTextField Error="@templateError" ErrorText="Template is required" Label="Select Template" Variant=Variant.Outlined Value="@(template is not null ? template.TemplateName : null )" ReadOnly Margin="Margin.Dense"></MudTextField>
+                            }
+                        </MudItem>
+                        <MudItem xs="4" Style="min-height:40px;" @onclick=@(() => OpenJournalClientSelectDialog())>
+                            @{
+                                var client = Clients.Where(x => x.ClientId == Journal.ClientId).FirstOrDefault();
+                                <MudTextField Error="@clientError" ErrorText="Client is required" Label="Select Client" Variant=Variant.Outlined Value="@(client is not null ? client.ClientFirstName+" "+client.ClientLastName : null)" ReadOnly Margin="Margin.Dense"></MudTextField>
+                            }
+                        </MudItem>
+                    </MudGrid>
+                </EditForm>
+            </MudItem>
+            <MudItem xs="12">
+                <MudTable Bordered=true Outlined CustomFooter=true FooterClass="table-foot-bordered" Items="Journal.JournalDetail" @ref=JournalDetailTable Class="mt-2" FixedHeader Dense>
+                    <HeaderContent>
+                        <MudTh></MudTh>
+                        <MudTh>Account Code</MudTh>
+                        <MudTh>Account Name</MudTh>
+                        <MudTh>Currency Type</MudTh>
+                        <MudTh>Client Code</MudTh>
+                        <MudTh>Client Name</MudTh>
+                        <MudTh>Exchange Rate</MudTh>
+                        <MudTh>Currency Amount</MudTh>
+                        <MudTh>Is Debit</MudTh>
+                        <MudTh>Debit Amount</MudTh>
+                        <MudTh>Credit Amount</MudTh>
+                        <MudTh>Cash Flow</MudTh>
+                    </HeaderContent>
+                    @* <RowTemplate>
+                    <MudTd DataLabel="Account">
+                    @{
+                    var account = Accounts.Where(x => x.AccountId == context.AccountId).FirstOrDefault();
+                    <MudText> @(account is not null ? $"{account.AccountName} - {account.AccountCode}" : "") </MudText>
+                    }
+                    </MudTd>
+                    <MudTd DataLabel="Currency">
+                    @{
+                    var currency = Currencies.Where(x => x.CurrencyId == context.CurrencyId).FirstOrDefault();
+                    <MudText> @(currency is not null ? currency.CurrencyCode : "") </MudText>
+                    }
+                    </MudTd>
+                    <MudTd DataLabel="Exchange Rate">
+                    @context.ExchangeRate
+                    </MudTd>
+                    <MudTd DataLabel="Debit">
+                    @context.IsDebit.ToString()
+                    </MudTd>
+                    <MudTd DataLabel="Cash Flow">
+
+                    </MudTd>
+                    <MudTd DataLabel="Client">
+
+                    </MudTd>
+                    </RowTemplate> *@
+                    <RowTemplate>
+                        <MudTd>
+                            <MudItem>
+                                @if (Journal.JournalDetail.Last() != context)
+                                {
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick=@(() => RemoveRow(context))></MudIconButton>
+                                }
+                            </MudItem>
+                        </MudTd>
+                        <MudTd DataLabel="Account Code">
+                            <MudItem Style="min-height:40px;" @onclick=@(() => OpenAccountSelectDialog(context)) @onkeydown=@((e) => OnEnterOpenAccountDialog(context,e))>
+                                @{
+                                    var account = Accounts.Where(x => x.AccountId == context.AccountId).FirstOrDefault();
+                                    <MudTextField Value="@(account is not null ? account.AccountCode: " ")" ReadOnly Margin="Margin.Dense"></MudTextField>
+                                }
+                            </MudItem>
+                        </MudTd>
+                        <MudTd DataLabel="Account name">
+                            <MudItem Style="min-height:40px;" @onclick=@(() => OpenAccountSelectDialog(context))>
+                                @{
+                                    var account = Accounts.Where(x => x.AccountId == context.AccountId).FirstOrDefault();
+                                    <MudTextField Value="@(account is not null ? account.AccountName: " ")" ReadOnly Margin="Margin.Dense"></MudTextField>
+                                }
+                            </MudItem>
+                        </MudTd>
+                        <MudTd DataLabel="Currency Type">
+                            <MudItem>
+                                @{
+                                    var account = Accounts.Where(x => x.AccountId == context.AccountId).FirstOrDefault();
+                                    if (account is not null)
+                                    {
+                                        var currency = Currencies.Where(x => x.CurrencyId == account.CurrencyId).FirstOrDefault();
+
+                                        if (currency is not null)
+                                        {
+                                            <MudTextField Value="@currency.CurrencyCode" ReadOnly Margin="Margin.Dense"></MudTextField>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <MudTextField Value=@(" ") ReadOnly Margin="Margin.Dense"></MudTextField>
+                                    }
+                                }
+                            </MudItem>
+                        </MudTd>
+                        <MudTd DataLabel="Client Code">
+                            <MudItem Style="min-height:40px;" @onclick=@(() => OpenClientSelectDialog(context)) @onkeydown=@((e) => OnEnterOpenClientDialog(e))>
+                                @{
+                                    var client = Clients.Where(x => x.ClientId == context.ClientId).FirstOrDefault();
+                                    <MudTextField Value="@(client is not null ? client.ClientCode : " ")" ReadOnly Margin="Margin.Dense"></MudTextField>
+                                }
+                            </MudItem>
+                        </MudTd>
+                        <MudTd DataLabel="Client Name">
+                            <MudItem Style="min-height:40px;" @onclick=@(() => OpenClientSelectDialog(context))>
+                                @{
+                                    var client = Clients.Where(x => x.ClientId == context.ClientId).FirstOrDefault();
+                                    <MudTextField Value="@(client is not null ? client.ClientFirstName + " " + client.ClientLastName : " ")" ReadOnly Margin="Margin.Dense"></MudTextField>
+                                }
+                            </MudItem>
+                        </MudTd>
+                        <MudTd DataLabel="Exchange Rate">
+                            <MudItem>
+                                @{
+                                    var account = Accounts.Where(x => x.AccountId == context.AccountId).FirstOrDefault();
+                                    if (account is not null)
+                                    {
+                                        var currency = Currencies.Where(x => x.CurrencyId == account.CurrencyId).FirstOrDefault();
+
+                                        if (currency is not null)
+                                        {
+                                            if (context.ExchangeRate is null){
+                                                context.ExchangeRate = currency.DefaultValue;
+                                            }
+                                            <MudTextField Style="border: none !important;" ReadOnly=@(currency.CurrencyCode.ToLower() == "mnt") @bind-Value="@context.ExchangeRate" Margin="Margin.Dense" For="(() => context.ExchangeRate)"></MudTextField>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <MudTextField Value=@(" ") ReadOnly Margin="Margin.Dense"></MudTextField>
+                                    }
+                                }
+                                @* <MudTextField Style="border: none !important;" @bind-Value="@context.ExchangeRate" Margin="Margin.Dense" For="(() => context.ExchangeRate)"></MudTextField> *@
+                            </MudItem>
+                        </MudTd>
+                        <MudTd DataLabel="Currency Amount">
+                            <MudItem>
+                                <MudTextField @bind-Value="@context.CurrencyAmount" Margin="Margin.Dense" For="(() => context.CurrencyAmount)"></MudTextField>
+                            </MudItem>
+                        </MudTd>
+                        <MudTd DataLabel="Is Debit">
+                            <MudItem>
+                                <MudCheckBox @bind-Value=context.IsDebit Color="Color.Primary"></MudCheckBox>
+                            </MudItem>
+                        </MudTd>
+                        <MudTd DataLabel="Debit Amount">
+                            @if (context.IsDebit)
+                            {
+                                <MudItem>
+                                    <MudTextField Value="@(context.ExchangeRate*context.CurrencyAmount)" ReadOnly Margin="Margin.Dense"></MudTextField>
+                                </MudItem>
+                            }
+                        </MudTd>
+                        <MudTd DataLabel="Credit Amount">
+                            @if (!context.IsDebit)
+                            {
+                                <MudItem>
+                                    <MudTextField Value="@(context.ExchangeRate*context.CurrencyAmount)" ReadOnly Margin="Margin.Dense"></MudTextField>
+                                </MudItem>
+                            }
+                        </MudTd>
+                        <MudTd DataLabel="Cash Flow">
+
+                        </MudTd>
+                    </RowTemplate>
+                    <FooterContent>
+                        <MudTFootRow>
+                            <MudTd colspan="9"><MudText Class="pa-3">Total</MudText></MudTd>
+                            <MudTd>
+                                <MudText Align="Align.Center">
+                                    @(Journal.JournalDetail.Where(x => x.IsDebit == true).Sum(s => s.CurrencyAmount * s.ExchangeRate))
+                                </MudText>
+                            </MudTd>
+                            <MudTd>
+                                <MudText Align="Align.Center">
+                                    @(Journal.JournalDetail.Where(x => x.IsDebit == false).Sum(s => s.CurrencyAmount * s.ExchangeRate))
+                                </MudText>
+                            </MudTd>
+                            <MudTd></MudTd>
+                        </MudTFootRow>
+                    </FooterContent>
+                    <PagerContent>
+                        <MudTablePager PageSizeOptions="new int[]{50, 100}" />
+                    </PagerContent>
+                </MudTable>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+</MudDialog>
+
+
+<style>
+    .mud-input.mud-input-underline::after {
+        border-bottom: none;
+    }
+
+    .mud-input.mud-input-underline::before {
+        border-bottom: none;
+    }
+
+    .mud-input.mud-input-underline:hover:not(.mud-disabled)::before {
+        border-bottom: none;
+    }
+
+    /*     .mud-table-row td:last-child, .mud-table-row th:last-child {
+            display: none;
+        } */
+</style>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public int EditJournalId { get; set; } = 0;
+
+    public List<Journal> JournalList = new List<Journal>();
+    private DialogOptions _dialogOption = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true, CloseButton = true };
+
+    public Journal Journal { get; set; } = new();
+    public Account SelectedAccount { get; set; } = new();
+
+    List<DocumentType> DocumentTypes = new();
+    List<Template> Templates = new();
+    List<Account> Accounts = new();
+    List<Client> Clients = new();
+    List<Currency> Currencies = new();
+
+    MudTable<JournalDetail> JournalDetailTable = new();
+    public DateTime? journalDate = DateTime.UtcNow;
+    bool clientError = false;
+    bool templateError = false;
+    bool documentTypeError = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Accounts = await _AccountService.GetAccounts();
+        Currencies = await _currencyService.GetCurrencies();
+        Clients = await _clientService.GetClients();
+        DocumentTypes = await _documentService.GetDocumentTypes();
+        Templates = await _templateService.GetTemplates();
+        if(EditJournalId != 0)
+        {
+            Journal = await _journalService.GetJournalById(EditJournalId);
+        }
+        else
+        {
+            Journal = new();
+            Journal.JournalDetail = new();
+        }
+        journalDate = Journal is null ? DateTime.UtcNow : Journal.DocumentDate;
+        Journal.JournalDetail.Add(new());
+
+    }
+
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        Journal.DocumentDate = journalDate ?? DateTime.UtcNow;
+        Random rnd = new();
+        Journal.UserId = rnd.Next(0, 1000000);
+        var lastJournal = Journal.JournalDetail.Last();
+        Journal.JournalDetail.Remove(lastJournal);
+        bool isValid = context.Validate();
+        if (isValid)
+        {
+            clientError = Journal.ClientId == 0;
+            documentTypeError = Journal.DocumentTypeId == 0;
+
+            if (clientError || documentTypeError)
+            {
+
+            }
+            else
+            {
+                var debitAmount = Journal.JournalDetail.Where(x => x.IsDebit == true).Sum(s => s.CurrencyAmount * s.ExchangeRate);
+                var creditAmount = Journal.JournalDetail.Where(x => x.IsDebit == false).Sum(s => s.CurrencyAmount * s.ExchangeRate);
+                if (debitAmount == creditAmount)
+                {
+                    var response = await _journalService.SaveJournal(Journal);
+                    if (response is not null)
+                    {
+                        _snakBar.Add("Transaction Added Succesfully.", Severity.Success);
+                        MudDialog.Close(DialogResult.Ok(response));
+                    }
+                    else
+                    {
+                        _snakBar.Add("Something went wrong.", Severity.Error);
+                    }
+                }
+                else
+                {
+                    _snakBar.Add("Debit and Credit amount are not equal.", Severity.Error);
+
+                }
+            }
+        }
+        Journal.JournalDetail.Add(lastJournal);
+    }
+
+    // private void ChangeRow(object element)
+    // {
+    //     _snakBar.Add("row changed", Severity.Success);
+    //     if(((JournalDetail)element) == Journal.JournalDetail.Last())
+    //     {
+    //         Journal.JournalDetail.Add(new());
+    //     }
+    //     StateHasChanged();
+    // }
+
+    // private void AddRow(JournalDetail journalDetail)
+    // {
+    //     _snakBar.Add("row changed", Severity.Success);
+    //     if (journalDetail == Journal.JournalDetail.Last())
+    //     {
+    //         Journal.JournalDetail.Add(new());
+    //     }
+    //     StateHasChanged();
+    // }
+    // private void ItemHasBeenCommitted(object element)
+    // {
+    //     AddEditionEvent($"RowEditCommit event: Changes to Element {((Element)element).Name} committed");
+    // }
+
+    private async Task OpenAccountSelectDialog(JournalDetail journalDetail)
+    {
+        var dialog = _dialog.Show<AccountDialog>("Select Account", _dialogOption);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var account = result.Data as Account;
+            JournalDetailTable.SelectedItem.AccountId = account.AccountId;
+
+            if (journalDetail == Journal.JournalDetail.Last())
+            {
+                Journal.JournalDetail.Add(new());
+            }
+            StateHasChanged();
+        }
+
+    }
+
+    private async Task OnEnterOpenAccountDialog(JournalDetail journalDetail, KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            var dialog = _dialog.Show<AccountDialog>("Select Account", _dialogOption);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                var account = result.Data as Account;
+                JournalDetailTable.SelectedItem.AccountId = account.AccountId;
+
+                if (journalDetail == Journal.JournalDetail.Last())
+                {
+                    Journal.JournalDetail.Add(new());
+                }
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task OnEnterOpenClientDialog(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            var dialog = _dialog.Show<ClientDialog>("Select Client", _dialogOption);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                var client = result.Data as Client;
+                JournalDetailTable.SelectedItem.ClientId = client.ClientId;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task OpenClientSelectDialog(JournalDetail journalDetail)
+    {
+        var dialog = _dialog.Show<ClientDialog>("Select Client", _dialogOption);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var client = result.Data as Client;
+            JournalDetailTable.SelectedItem.ClientId = client.ClientId;
+        }
+        StateHasChanged();
+    }
+
+    private async Task OpenJournalClientSelectDialog()
+    {
+        var dialog = _dialog.Show<ClientDialog>("Select Client", _dialogOption);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var client = result.Data as Client;
+            Journal.ClientId = client.ClientId;
+            clientError = false;
+        }
+        StateHasChanged();
+    }
+
+
+    private async Task OpenDocumentTypeSelectDialog()
+    {
+        var dialog = _dialog.Show<DocumentTypeDialog>("Select Document Type", _dialogOption);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var documentType = result.Data as DocumentType;
+            Journal.DocumentTypeId = documentType.DocumentTypeId;
+            documentTypeError = false;
+        }
+        StateHasChanged();
+    }
+
+    private async Task OpenTemplateSelectDialog()
+    {
+        var dialog = _dialog.Show<TemplateDialog>("Select Template", _dialogOption);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var template = result.Data as Template;
+            Journal.TemplateId = template.TemplateId;
+            var lastJournalDetail = Journal.JournalDetail.Last();
+            Journal.JournalDetail.Remove(lastJournalDetail);
+            Journal.JournalDetail.AddRange(template.TemplateDetail.Select(x => new JournalDetail
+                {
+                    AccountId = x.AccountId,
+                    IsDebit = x.IsDebit
+                }));
+            Journal.JournalDetail.Add(new());
+            templateError = false;
+        }
+        StateHasChanged();
+    }
+
+    private void OnSelectedValuesChanged(IEnumerable<int?> values)
+    {
+        var templateId = values.FirstOrDefault();
+        var template = Templates.Where(x => x.TemplateId == templateId).FirstOrDefault();
+        var lastRow = Journal.JournalDetail.Last();
+        _snakBar.Add("changed", Severity.Info);
+        // lastRow.AccountId = template.TemplateDetail.FirstOrDefault().
+    }
+
+    private void RemoveRow(JournalDetail journalDetail)
+    {
+        Journal.JournalDetail.Remove(journalDetail);
+    }
+}

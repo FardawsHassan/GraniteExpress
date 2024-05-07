@@ -1,0 +1,281 @@
+USE [GraniteExpress2]
+GO
+
+INSERT INTO [dbo].[Clientype]
+           ([ClientType])
+     VALUES
+           ('european')
+GO
+
+INSERT INTO [dbo].[Clientype]
+           ([ClientType])
+     VALUES
+           ('american')
+GO
+
+
+
+
+INSERT INTO [dbo].[RefClient]
+           ([ClientTypeId]
+           ,[ClientFirstName]
+           ,[ClientLastName]
+           ,[ClientCode])
+     VALUES
+           (1
+           ,'Fardaws'
+           ,'Hassan'
+           ,'FA12')
+GO
+
+INSERT INTO [dbo].[RefClient]
+           ([ClientTypeId]
+           ,[ClientFirstName]
+           ,[ClientLastName]
+           ,[ClientCode])
+     VALUES
+           (1
+           ,'Saima'
+           ,'Sultana'
+           ,'SM33')
+GO
+
+
+
+INSERT INTO [dbo].[RefCurrency]
+           ([CurrencyCode]
+           ,[DefaultValue])
+     VALUES
+           ('MNT'
+           ,null)
+		   
+INSERT INTO [dbo].[RefCurrency]
+           ([CurrencyCode]
+           ,[DefaultValue])
+     VALUES
+           ('BDT'
+           ,null)
+		   		   
+INSERT INTO [dbo].[RefCurrency]
+           ([CurrencyCode]
+           ,[DefaultValue])
+     VALUES
+           ('USD'
+           ,null)
+
+GO
+
+
+
+
+INSERT INTO [dbo].[RefDocumentType]
+           ([DocumentName]
+           ,[DocumentCode]
+           ,[DocumentMaxValue])
+     VALUES
+           ('document_type_1',
+           1211121,
+           111)
+		   
+INSERT INTO [dbo].[RefDocumentType]
+           ([DocumentName]
+           ,[DocumentCode]
+           ,[DocumentMaxValue])
+     VALUES
+           ('document_type_2',
+           1211545,
+           121)
+GO
+
+
+
+
+INSERT INTO [dbo].[RefAccountType]
+           ([AccountTypeCode]
+           ,[AccountTypeName]
+           ,[isDebit]
+           ,[BalanceId]
+           ,[CashId]
+           ,[IncomeId]
+           ,[EquityId])
+     VALUES
+           (101120
+           ,'Account_Type_1'
+           ,1
+		   ,null,null,null,null)
+
+INSERT INTO [dbo].[RefAccountType]
+           ([AccountTypeCode]
+           ,[AccountTypeName]
+           ,[isDebit]
+           ,[BalanceId]
+           ,[CashId]
+           ,[IncomeId]
+           ,[EquityId])
+     VALUES
+           (101120
+           ,'Account_Type_2'
+           ,0
+		   ,null,null,null,null)
+
+INSERT INTO [dbo].[RefAccountType]
+           ([AccountTypeCode]
+           ,[AccountTypeName]
+           ,[isDebit]
+           ,[BalanceId]
+           ,[CashId]
+           ,[IncomeId]
+           ,[EquityId])
+     VALUES
+           (101120
+           ,'Account_Type_3'
+           ,1
+		   ,null,null,null,null)
+
+GO
+
+
+
+
+INSERT INTO [dbo].[RefTemplate]
+           ([TemplateName]
+           ,[isActive])
+     VALUES
+           ('Template_1'
+           ,1)
+
+INSERT INTO [dbo].[RefTemplate]
+           ([TemplateName]
+           ,[isActive])
+     VALUES
+           ('Template_2'
+           ,1)
+
+INSERT INTO [dbo].[RefTemplate]
+           ([TemplateName]
+           ,[isActive])
+     VALUES
+           ('Template_3'
+           ,1)
+
+GO
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+INSERT INTO [dbo].[RefAccount]
+           ([AccountCode]
+           ,[AccountTypeId]
+           ,[CurrencyId]
+           ,[AccountName]
+           ,[IsActive])
+     VALUES
+           ('C5654'
+           ,1
+           ,1
+           ,'Cash in Hand'
+           ,1)
+GO
+
+INSERT INTO [dbo].[RefAccount]
+           ([AccountCode]
+           ,[AccountTypeId]
+           ,[CurrencyId]
+           ,[AccountName]
+           ,[IsActive])
+     VALUES
+           ('B3232'
+           ,2
+           ,2
+           ,'Bank'
+           ,2)
+GO
+
+
+
+
+USE [GraniteExpress4]
+GO
+
+INSERT INTO [dbo].[RefTemplateDetails]
+           ([TemplateId]
+           ,[AccountId]
+           ,[IsDebit]
+           ,[ClientId])
+     VALUES
+           (1
+           ,1
+           ,1
+           ,1)
+GO
+
+INSERT INTO [dbo].[RefTemplateDetails]
+           ([TemplateId]
+           ,[AccountId]
+           ,[IsDebit]
+           ,[ClientId])
+     VALUES
+           (2
+           ,2
+           ,0
+           ,2)
+GO
+
+INSERT INTO [dbo].[RefTemplateDetails]
+           ([TemplateId]
+           ,[AccountId]
+           ,[IsDebit]
+           ,[ClientId])
+     VALUES
+           (1
+           ,2
+           ,0
+           ,2)
+GO
+
+
+INSERT INTO [dbo].[RefTemplateDetails]
+           ([TemplateId]
+           ,[AccountId]
+           ,[IsDebit]
+           ,[ClientId])
+     VALUES
+           (1
+           ,1
+           ,1
+           ,2)
+GO
+
+
+
+
+

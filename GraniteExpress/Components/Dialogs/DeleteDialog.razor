@@ -1,0 +1,21 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudItem Class="pa-3">
+            Are you sure you want to delete this ?
+        </MudItem>
+    </DialogContent>
+    <DialogActions>
+        <MudItem Class="pa-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit">Yes</MudButton>
+            <MudButton Variant="Variant.Filled" OnClick="Cancel" Color="Color.Error">Cancel</MudButton>
+        </MudItem>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+}
+

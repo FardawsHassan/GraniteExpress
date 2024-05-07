@@ -1,0 +1,57 @@
+﻿@inject IAccountService _accountService
+<MudDialog>
+    <DialogContent>
+        <MudTable Items="Accounts" @ref=mudtable @bind-SelectedItem="SelectedAccount" Class="mb-5">
+            <HeaderContent>
+                <MudTh>Account Name</MudTh>
+                <MudTh>Account Code</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(@context))>
+                        <MudTextField Value="@context.AccountName" ReadOnly Margin="Margin.Dense"></MudTextField>
+                    </MudItem>
+                </MudTd>
+                <MudTd>
+                    <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(@context))>
+                        <MudTextField Value="@context.AccountCode" ReadOnly Margin="Margin.Dense"></MudTextField>
+                    </MudItem>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </DialogContent>
+</MudDialog>
+
+<style>
+    .mud-input.mud-input-underline::after {
+        border-bottom: none;
+    }
+
+    .mud-input.mud-input-underline::before {
+        border-bottom: none;
+    }
+
+    .mud-input.mud-input-underline:hover:not(.mud-disabled)::before {
+        border-bottom: none;
+    }
+</style>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    MudTable<Account> mudtable = new();
+
+    List<Account> Accounts = new();
+    Account SelectedAccount = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Accounts = await _accountService.GetAccounts();
+    }
+
+    public void RowSelected(Account account)
+    {
+        MudDialog.Close(DialogResult.Ok(account));
+    }
+}
