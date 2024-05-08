@@ -12,7 +12,9 @@
     </MudNavGroup>
     <MudNavGroup Title="Journal" Icon="@Icons.Material.Filled.CurrencyExchange" Expanded="true">
         <MudNavLink Href="/transaction" Match="NavLinkMatch.Prefix">Transaction</MudNavLink>
-        <MudNavLink Href="/view" Match="NavLinkMatch.Prefix">View</MudNavLink>
+        <AuthorizeView Roles="Admin">
+            <MudNavLink Href="/view" Match="NavLinkMatch.Prefix">View</MudNavLink>
+        </AuthorizeView>
     </MudNavGroup>
     <MudNavGroup Icon="@Icons.Material.Filled.Dashboard" Title="Report" Expanded="true">
         <MudNavLink Href="/accounts" Match="NavLinkMatch.Prefix">List of Transaction</MudNavLink>

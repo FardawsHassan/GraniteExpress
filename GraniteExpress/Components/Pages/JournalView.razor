@@ -1,6 +1,7 @@
 ﻿@page "/view"
 @using GraniteExpress.Components.Dialogs
 @inject IJournalService _journalService
+@attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Journal View</PageTitle>
 

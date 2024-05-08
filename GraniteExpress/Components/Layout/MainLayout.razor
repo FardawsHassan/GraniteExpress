@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-
+@inject NavigationManager _navigationManager
 <MudThemeProvider IsDarkMode=true Theme="_theme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -7,6 +7,8 @@
 <MudLayout>
     <MudAppBar>
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+            <MudSpacer />
+        <MudIconButton Style="color:white" Icon="@Icons.Material.Filled.Logout" OnClick="Logout" />
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen">
         <NavMenu/>
@@ -25,5 +27,29 @@
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var state = await _authStateProvider.GetAuthenticationStateAsync();
+            var user = state.User;
+
+            var userId = user.GetUserId();
+            var userName = user.GetUserName();
+
+            _currentUser.SetState(userId, userName);
+        }
+        catch
+        {
+
+        }
+    }
+
+    private async Task Logout()
+    {
+        await ((AuthStateProvider)_authStateProvider).ClearStateAsync();
+        _navigationManager.NavigateTo("login");
     }
 }

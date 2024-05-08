@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GraniteExpress.Data
 {
-	public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
+	public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<User>(options)
 	{
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -13,6 +13,9 @@ namespace GraniteExpress.Data
 				entity.Property(e => e.DefaultValue)
 					.HasDefaultValue(decimal.Parse("1"));
             });
+
+            modelBuilder.Entity<User>()
+                    .ToTable(nameof(User));
 
             modelBuilder.Entity<Account>()
 				.HasOne(p => p.AccountType)

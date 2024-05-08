@@ -1,5 +1,4 @@
 ﻿using GraniteExpress.Data;
-using GraniteExpress.Migrations;
 using GraniteExpress.Models;
 using Microsoft.AspNetCore.Identity;
 using MudBlazor.Extensions;
@@ -8,7 +7,7 @@ namespace GraniteExpress.Services
 {
     public interface IService
     {
-        Task<ApplicationUser> GetUserIdByEmail(string email);
+        //Task<ApplicationUser> GetUserIdByEmail(string email);
         Task<List<Template>> GetTemplates();
         Task<List<Journal>> GetJournals();
         Task<List<DocumentType>> GetDocumentTypes();
@@ -30,19 +29,19 @@ namespace GraniteExpress.Services
             _context = context;
         }
 
-        public async Task<ApplicationUser> GetUserIdByEmail(string email)
-        {
-            try
-            {
-                return _context.Users.Where(x => x.UserName == email).FirstOrDefault();
+        //public async Task<ApplicationUser> GetUserIdByEmail(string email)
+        //{
+        //    try
+        //    {
+        //        return _context.Users.Where(x => x.UserName == email).FirstOrDefault();
                 
-            }
-            catch (Exception)
-            {
+        //    }
+        //    catch (Exception)
+        //    {
 
-                return null;
-            }
-        }
+        //        return null;
+        //    }
+        //}
         
         public async Task<List<Template>> GetTemplates()
         {

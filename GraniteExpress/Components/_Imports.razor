@@ -1,5 +1,6 @@
 ﻿@using System.Net.Http
 @using System.Net.Http.Json
+@using GraniteExpress.Infrastructure
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
@@ -13,5 +14,12 @@
 @using GraniteExpress.Services
 @using GraniteExpress.Models
 @using MudBlazor
+@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Authorization
+@using GraniteExpress.DtoModels
+@using GraniteExpress.Helper
 @inject ISnackbar _snakBar
 @inject IDialogService _dialog
+@inject CurrentUserState _currentUser
+@inject ILocalStorageService _localStorageService
+@inject AuthenticationStateProvider _authStateProvider
