@@ -1,117 +1,133 @@
 ﻿@page "/view"
 @using GraniteExpress.Components.Dialogs
 @inject IJournalService _journalService
-@attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Journal View</PageTitle>
 
 <MudGrid>
-    <MudDataGrid T="Models.JournalView" Items="JournalViews" ColumnResizeMode="ResizeMode.Container" SortMode="SortMode.Multiple" Dense=true Filterable="true"
-                 Hideable="true">
-        <ToolBarContent>
-            <MudText Typo="Typo.h6">Journal Views</MudText>
-        </ToolBarContent>
-        <Columns>
-            <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.DocumentName" Title="Document Name">
-                <CellTemplate>
-                    @context.Item.DocumentName
-                </CellTemplate>
-            </PropertyColumn>
-            <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.DocumentNo" Title="Document No" />
-            <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.DocumentTypeId" Title="Document type" />
-            <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.CurrencyAmount" Title="Currency Amount">
-                <CellTemplate>
-                    @if (context.Item.CurrencyAmount is not null)
-                    {
-                        @context.Item.CurrencyAmount.Value.ToString("0.00")
-                    }
-                </CellTemplate>    
-            </PropertyColumn>
-            <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.AccountCode" Title="Account Code" />
-            <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.ClientFirstName" Title="Client First name" />
-            <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.ClientLastName" Title="Client Last name" />
-            <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.DocumentDate" Title="Document Date">
-                <CellTemplate>
-                    @if(context.Item.DocumentDate is not null)
-                    {
-                        @context.Item.DocumentDate.Value.ToString("dd/MM/yyyy")
-                    }
-                </CellTemplate>
-            </PropertyColumn>
-            <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.ExchangeRate" Title="Exchange Rate">
-                <CellTemplate>
-                    @if (context.Item.ExchangeRate is not null)
-                    {
-                        @context.Item.ExchangeRate.Value.ToString("0.00")
-                    }
-                </CellTemplate>
-            </PropertyColumn>
-            <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.IsActive" Title="Is Active">
-                <CellTemplate>
-                    @context.Item.IsActive.ToString()
-                </CellTemplate>
-            </PropertyColumn>
-            <TemplateColumn CellStyleFunc="@_cellStyleFunc" Title="Debit Amount">
-                <CellTemplate>
-                    @if ((context.Item.IsDebit is not null))
-                    {
-                        if (context.Item.IsDebit is true)
+    <AuthorizeView Policy="JournalViewTable" Context="table">
+        <MudDataGrid T="Models.JournalView" Items="JournalViews" ColumnResizeMode="ResizeMode.Container" SortMode="SortMode.Multiple" Dense=true Filterable="true"
+                     Hideable="true">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Journal Views</MudText>
+            </ToolBarContent>
+            <Columns>
+                <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.DocumentName" Title="Document Name">
+                    <CellTemplate>
+                        @context.Item.DocumentName
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.DocumentNo" Title="Document No" />
+                <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.DocumentTypeId" Title="Document type" />
+                <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.CurrencyAmount" Title="Currency Amount">
+                    <CellTemplate>
+                        @if (context.Item.CurrencyAmount is not null)
                         {
-                            <MudText>@(((context.Item.CurrencyAmount ?? 0) * (context.Item.ExchangeRate ?? 0)).ToString("0.00"))</MudText>
+                            @context.Item.CurrencyAmount.Value.ToString("0.00")
                         }
-                    }else{@(" ")}
-                </CellTemplate>
-            </TemplateColumn>
-            <TemplateColumn CellStyleFunc="@_cellStyleFunc" Title="Credit Amount" >
-                <CellTemplate>
-                    @if ((context.Item.IsDebit is not null))
-                    {
-                        if (context.Item.IsDebit is false)
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.AccountCode" Title="Account Code" />
+                <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.ClientFirstName" Title="Client First name" />
+                <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.ClientLastName" Title="Client Last name" />
+                <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.DocumentDate" Title="Document Date">
+                    <CellTemplate>
+                        @if (context.Item.DocumentDate is not null)
                         {
-                            <MudText>@(((context.Item.CurrencyAmount ?? 0) * (context.Item.ExchangeRate ?? 0)).ToString("0.00"))</MudText>
+                            @context.Item.DocumentDate.Value.ToString("dd/MM/yyyy")
                         }
-                    }
-                    else
-                    {
-                        @(" ")
-                    }
-                </CellTemplate>
-            </TemplateColumn>
-            <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.IsDebit" Title="Is Debit">
-                <CellTemplate>
-                    @context.Item.IsDebit.ToString()
-                </CellTemplate>
-            </PropertyColumn>
-            <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.JournalDescription" Title="Journal Description" />
-            <TemplateColumn CellStyleFunc="@_cellStyleFunc" Title="Action" Filterable="false">
-                <CellTemplate>
-                    <MudItem Class="d-flex gap-2">
-                        <MudButton Variant="Variant.Outlined" Color="Color.Info" OnClick="@(async () => await EditJournal(context.Item))">Edit</MudButton>
-                        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@(async () => await DeleteJournal(context.Item))">Delete</MudButton>
-                    </MudItem>
-                </CellTemplate>
-            </TemplateColumn>
-        </Columns>
-        <PagerContent>
-            <MudDataGridPager T="Models.JournalView" />
-        </PagerContent>
-    </MudDataGrid>
-    <MudItem xs="12" Class="d-flex gap-4">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddJournalDialog">Add Record</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary">Print</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary">Export to Excel</MudButton>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.ExchangeRate" Title="Exchange Rate">
+                    <CellTemplate>
+                        @if (context.Item.ExchangeRate is not null)
+                        {
+                            @context.Item.ExchangeRate.Value.ToString("0.00")
+                        }
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.IsActive" Title="Is Active">
+                    <CellTemplate>
+                        @context.Item.IsActive.ToString()
+                    </CellTemplate>
+                </PropertyColumn>
+                <TemplateColumn CellStyleFunc="@_cellStyleFunc" Title="Debit Amount">
+                    <CellTemplate>
+                        @if ((context.Item.IsDebit is not null))
+                        {
+                            if (context.Item.IsDebit is true)
+                            {
+                                <MudText>@(((context.Item.CurrencyAmount ?? 0) * (context.Item.ExchangeRate ?? 0)).ToString("0.00"))</MudText>
+                            }
+                        }
+                        else
+                        {
+                            @(" ")
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn CellStyleFunc="@_cellStyleFunc" Title="Credit Amount">
+                    <CellTemplate>
+                        @if ((context.Item.IsDebit is not null))
+                        {
+                            if (context.Item.IsDebit is false)
+                            {
+                                <MudText>@(((context.Item.CurrencyAmount ?? 0) * (context.Item.ExchangeRate ?? 0)).ToString("0.00"))</MudText>
+                            }
+                        }
+                        else
+                        {
+                            @(" ")
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+                <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.IsDebit" Title="Is Debit">
+                    <CellTemplate>
+                        @context.Item.IsDebit.ToString()
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.JournalDescription" Title="Journal Description" />
+                <TemplateColumn CellStyleFunc="@_cellStyleFunc" Title="Action" Filterable="false">
+                    <CellTemplate>
+                        <MudItem Class="d-flex gap-2">
+                            <AuthorizeView Policy="JournalViewEdit" Context="edit">
+                                <MudButton Variant="Variant.Outlined" Color="Color.Info" OnClick="@(async () => await EditJournal(context.Item))">Edit</MudButton>
+                            </AuthorizeView>
+                            <AuthorizeView Policy="JournalViewDelete" Context="delete">
+                                <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@(async () => await DeleteJournal(context.Item))">Delete</MudButton>
+                            </AuthorizeView>
+                        </MudItem>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="Models.JournalView" />
+            </PagerContent>
+        </MudDataGrid>
+    </AuthorizeView>
+    <MudItem xs="12" Class="d-flex gap-3">
+        <AuthorizeView Policy="JournalViewAdd">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddJournalDialog">Add Record</MudButton>
+        </AuthorizeView>
+        <AuthorizeView Policy="JournalViewPrint">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary">Print</MudButton>
+        </AuthorizeView>
+        <AuthorizeView Policy="JournalViewExport">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary">Export to Excel</MudButton>
+        </AuthorizeView>
     </MudItem>
 </MudGrid>
 
 
-@code{
-    List<Models.JournalView> JournalViews {get;set;} = new();
+@code {
+    List<Models.JournalView> JournalViews { get; set; } = new();
     DialogOptions _dialogOption = new DialogOptions() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true, DisableBackdropClick = true, CloseButton = true };
 
     int prevJournalId = 0;
     bool gray = true;
 
-    protected override async Task OnInitializedAsync(){
+    protected override async Task OnInitializedAsync()
+    {
         JournalViews = await _journalService.GetJournalViews();
     }
 
@@ -146,18 +162,21 @@
         }
     }
 
-    public async Task EditJournal(Models.JournalView journalView){
+    public async Task EditJournal(Models.JournalView journalView)
+    {
+        var cloneJournalView = CloneInstance.Clone<Models.JournalView>(journalView);
         var dialogData = new DialogParameters
             {
-                ["EditJournalId"] = journalView.JournalId
+                ["EditJournalId"] = cloneJournalView.JournalId
             };
-        var dialog = _dialog.Show<EditJournalDialog>("Edit Journal", dialogData,  _dialogOption);
+        var dialog = await _dialog.ShowAsync<AddJournalDialog>("Edit Journal", dialogData, _dialogOption);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
             try
             {
+                _snakBar.Add("Journal addtion succesful.", Severity.Success);
                 JournalViews = await _journalService.GetJournalViews();
                 StateHasChanged();
             }
@@ -165,16 +184,18 @@
             {
                 _snakBar.Add("Journal addtion failed.", Severity.Error);
             }
+
         }
     }
 
-    public async Task DeleteJournal(Models.JournalView journalView){
-        DialogOptions deleteDialogOption = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true, CloseButton = true };
+    public async Task DeleteJournal(Models.JournalView journalView)
+    {
+        DialogOptions deleteDialogOption = new DialogOptions() { MaxWidth = MaxWidth.ExtraSmall, FullWidth = true, DisableBackdropClick = true, CloseButton = true };
         var dialog = _dialog.Show<DeleteDialog>("Delete Journal", deleteDialogOption);
         var result = await dialog.Result;
         if (!result.Canceled)
         {
-            var isDeleted = await _journalService.DeleteJournal(journalView.JournalId??0);
+            var isDeleted = await _journalService.DeleteJournal(journalView.JournalId ?? 0);
             if (isDeleted)
             {
                 JournalViews = await _journalService.GetJournalViews();

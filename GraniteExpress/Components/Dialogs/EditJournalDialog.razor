@@ -272,8 +272,8 @@
     private async Task OnValidSubmit(EditContext context)
     {
         Journal.DocumentDate = journalDate ?? DateTime.UtcNow;
-        Random rnd = new();
-        Journal.UserId = rnd.Next(0, 1000000);
+        // Random rnd = new();
+        Journal.UserId = _currentUser.UserId.ToString();
         var lastJournal = Journal.JournalDetail.Last();
         Journal.JournalDetail.Remove(lastJournal);
         bool isValid = context.Validate();
@@ -293,7 +293,7 @@
                 if (debitAmount == creditAmount)
                 {
                     var response = await _journalService.SaveJournal(Journal);
-                    if (response is not null)
+                    if (response is true)
                     {
                         _snakBar.Add("Transaction Added Succesfully.", Severity.Success);
                         MudDialog.Close(DialogResult.Ok(response));

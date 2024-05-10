@@ -1,0 +1,69 @@
+﻿@inject ICashFlowService _cashFlowService
+<MudDialog>
+    <DialogContent>
+        @* <MudDataGrid T="CashFlow" Items="@CashFlows" FilterMode=DataGridFilterMode.ColumnFilterRow FilterCaseSensitivity=DataGridFilterCaseSensitivity.CaseInsensitive SortMode="SortMode.Multiple" Dense=true Filterable="true" Class="mb-5"> *@
+        <MudDataGrid T="CashFlow" Items="@CashFlows" FilterMode=DataGridFilterMode.ColumnFilterRow Dense=true Class="mb-5">
+            <Columns>
+                <PropertyColumn Property="x => x.OrderId">
+                    <CellTemplate>
+                        <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(context.Item))>
+                            <MudTextField Value="@context.Item.OrderId" ReadOnly Margin="Margin.Dense"></MudTextField>
+                        </MudItem>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.CashFlowDescription" Title="First Name">
+                    <CellTemplate>
+                        <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(context.Item))>
+                            <MudTextField Value="@context.Item.CashFlowDescription" ReadOnly Margin="Margin.Dense"></MudTextField>
+                        </MudItem>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.IsVisible" Title="Last Name">
+                    <CellTemplate>
+                        <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(context.Item))>
+                            <MudTextField Value="@context.Item.IsVisible.ToString()" ReadOnly Margin="Margin.Dense"></MudTextField>
+                        </MudItem>
+                    </CellTemplate>
+                </PropertyColumn>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="CashFlow"/>
+            </PagerContent>
+        </MudDataGrid>
+    </DialogContent>
+</MudDialog>
+
+<style>
+    .mud-input.mud-input-underline::after {
+        border-bottom: none;
+    }
+
+    .mud-input.mud-input-underline::before {
+        border-bottom: none;
+    }
+
+    .mud-input.mud-input-underline:hover:not(.mud-disabled)::before {
+        border-bottom: none;
+    }
+
+    .detailsHeader {
+        background: #4b4b57;
+    }
+</style>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    MudTable<CashFlow> mudtable = new();
+
+    List<CashFlow> CashFlows = new();
+    CashFlow SelectedCashFlow = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        CashFlows = await _cashFlowService.GetCashFlows();
+    }
+
+    public void RowSelected(CashFlow cashFlow) => MudDialog.Close(DialogResult.Ok(cashFlow));
+}

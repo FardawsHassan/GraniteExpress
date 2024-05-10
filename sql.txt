@@ -43,25 +43,19 @@ GO
 
 
 INSERT INTO [dbo].[RefCurrency]
-           ([CurrencyCode]
-           ,[DefaultValue])
+           ([CurrencyCode])
      VALUES
-           ('MNT'
-           ,null)
+           ('MNT')
 		   
 INSERT INTO [dbo].[RefCurrency]
-           ([CurrencyCode]
-           ,[DefaultValue])
+           ([CurrencyCode])
      VALUES
-           ('BDT'
-           ,null)
+           ('BDT')
 		   		   
 INSERT INTO [dbo].[RefCurrency]
-           ([CurrencyCode]
-           ,[DefaultValue])
+           ([CurrencyCode])
      VALUES
-           ('USD'
-           ,null)
+           ('USD')
 
 GO
 
@@ -163,35 +157,6 @@ GO
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 INSERT INTO [dbo].[RefAccount]
            ([AccountCode]
            ,[AccountTypeId]
@@ -221,10 +186,6 @@ INSERT INTO [dbo].[RefAccount]
 GO
 
 
-
-
-USE [GraniteExpress4]
-GO
 
 INSERT INTO [dbo].[RefTemplateDetails]
            ([TemplateId]
@@ -275,6 +236,48 @@ INSERT INTO [dbo].[RefTemplateDetails]
            ,2)
 GO
 
+
+
+
+INSERT INTO [dbo].[RefCashFlow]
+           ([OrderId]
+           ,[CashFlowDescription]
+           ,[IsVisible])
+     VALUES
+           (null
+           ,'test Description 1'
+           ,1)
+GO
+
+INSERT INTO [dbo].[RefCashFlow]
+           ([OrderId]
+           ,[CashFlowDescription]
+           ,[IsVisible])
+     VALUES
+           (null
+           ,'test Description 2'
+           ,1)
+GO
+
+INSERT INTO [dbo].[RefCashFlow]
+           ([OrderId]
+           ,[CashFlowDescription]
+           ,[IsVisible])
+     VALUES
+           (null
+           ,'test Description 3'
+           ,1)
+GO
+
+INSERT INTO [dbo].[RefCashFlow]
+           ([OrderId]
+           ,[CashFlowDescription]
+           ,[IsVisible])
+     VALUES
+           (null
+           ,'test Description 4'
+           ,1)
+GO
 
 
 

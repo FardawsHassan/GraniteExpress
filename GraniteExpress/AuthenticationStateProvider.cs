@@ -1,6 +1,8 @@
 ﻿using Blazored.LocalStorage;
+using GraniteExpress.Infrastructure;
 using GraniteExpress.Services;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
 namespace GraniteExpress
@@ -9,11 +11,13 @@ namespace GraniteExpress
     {
         private readonly ILocalStorageService _localStorageService;
         private readonly IUserService _userService;
+        private readonly CurrentUserState currentUser;
 
-        public AuthStateProvider(ILocalStorageService localStorageService, IUserService userService)
+        public AuthStateProvider(ILocalStorageService localStorageService, IUserService userService, CurrentUserState _currentUser)
         {
             _localStorageService = localStorageService;
             _userService = userService;
+            currentUser = _currentUser;
         }
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
@@ -28,13 +32,22 @@ namespace GraniteExpress
 
                     if (user is not null)
                     {
-                        identity = new ClaimsIdentity(new[]
+                        List<Claim> listOfClaims = new()
                         {
                             new Claim(ClaimTypes.NameIdentifier, user.Id),
                             new Claim(ClaimTypes.Name, user.UserName),
                             new Claim(ClaimTypes.Role, user.UserRole)
-                        }, "Authentication");
+                        };
+
+                        foreach(var item in user.Claims)
+                        {
+                            listOfClaims.Add(new Claim(item.Key, item.Value));
+                        }
+
+
+                        identity = new ClaimsIdentity((listOfClaims), "Authentication");
                     }
+
                 }
 
                 var state = new AuthenticationState(new ClaimsPrincipal(identity));

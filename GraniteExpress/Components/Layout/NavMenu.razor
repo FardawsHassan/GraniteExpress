@@ -10,20 +10,22 @@
         <MudNavLink Href="/client" Match="NavLinkMatch.Prefix">Clients</MudNavLink>
         <MudNavLink Href="/template" Match="NavLinkMatch.Prefix">Templates</MudNavLink>
     </MudNavGroup>
-    <MudNavGroup Title="Journal" Icon="@Icons.Material.Filled.CurrencyExchange" Expanded="true">
-        <MudNavLink Href="/transaction" Match="NavLinkMatch.Prefix">Transaction</MudNavLink>
-        <AuthorizeView Roles="Admin">
+    <AuthorizeView>
+        <MudNavGroup Title="Journal" Icon="@Icons.Material.Filled.CurrencyExchange" Expanded="true">
+            <MudNavLink Href="/transaction" Match="NavLinkMatch.Prefix">Transaction</MudNavLink>
             <MudNavLink Href="/view" Match="NavLinkMatch.Prefix">View</MudNavLink>
-        </AuthorizeView>
-    </MudNavGroup>
-    <MudNavGroup Icon="@Icons.Material.Filled.Dashboard" Title="Report" Expanded="true">
-        <MudNavLink Href="/accounts" Match="NavLinkMatch.Prefix">List of Transaction</MudNavLink>
-    </MudNavGroup>
-    <MudNavGroup Title="Admin" Icon="@Icons.Material.Filled.AdminPanelSettings" Expanded="true">
-        <MudNavLink Href="/users" Match="NavLinkMatch.Prefix">User</MudNavLink>
-        <MudNavLink Href="/roles" Match="NavLinkMatch.Prefix">Role</MudNavLink>
-        <MudNavLink Href="/claims" Match="NavLinkMatch.Prefix">Claims</MudNavLink>
-    </MudNavGroup>
+        </MudNavGroup>
+        <MudNavGroup Icon="@Icons.Material.Filled.Dashboard" Title="Report" Expanded="true">
+            <MudNavLink Href="/listoftransaction" Match="NavLinkMatch.Prefix">List of Transaction</MudNavLink>
+        </MudNavGroup>
+    </AuthorizeView>
+    <AuthorizeView Roles="Admin">
+        <MudNavGroup Title="Admin" Icon="@Icons.Material.Filled.AdminPanelSettings" Expanded="true">
+            <MudNavLink Href="/users" Match="NavLinkMatch.Prefix">User</MudNavLink>
+            <MudNavLink Href="/roles" Match="NavLinkMatch.Prefix">Role</MudNavLink>
+            <MudNavLink Href="/claims" Match="NavLinkMatch.Prefix">Claims</MudNavLink>
+        </MudNavGroup>
+    </AuthorizeView>
 </MudNavMenu>
 
 

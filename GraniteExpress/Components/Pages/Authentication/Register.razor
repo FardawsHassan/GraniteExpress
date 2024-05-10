@@ -3,48 +3,26 @@
 @attribute [AllowAnonymous]
 @inject IAuthenticationService _authService
 
-<div class="" style="display:flex;height: 100vh; overflow: hidden; background-size: cover;">
-    <div class="" style="width:100%;">
-        <div class="container" style="height:100%">
-            <div class="row align-items-center" style="height:100%">
-                <div class="col-12 py-3">
-                    <div class="" style="padding: 0; overflow: hidden; border-radius: 8px !important;">
-                        <div class="container-fluid" style="padding:0px; !important">
-                            <div class="row">
-                                <div class="col-12 col-md-6 p-5 position-relative align-items-center flex-column" style="display: flex; background-color: #147ebb">
-                                    <h2 style="color:white;font-size:38px;" class=" mt-3 mt-md-3 pt-0 pt-md-4 mb-4 d-none d-sm-block">Welcome!</h2>
-                                </div>
-                                <div class="col-12 col-md-6 p-5" style="background-color:ghostwhite">
-                                    <h5 class="mb-4">Register</h5>
-                                    <section>
-                                        <EditForm Model="@_register" OnValidSubmit="Submit" Enhance>
-                                            <DataAnnotationsValidator />
-                                            <MudTextField Class="pb-4" @bind-Value="_register.Email" Immediate="true" Label="Email" Variant="Variant.Outlined" Margin="Margin.Dense" For="() => _register.Email" />
-                                            <MudTextField Class="pb-4" @bind-Value="_register.Password" HelperText="Password should contain digit & alphanumeric characters" Immediate="true" Label="Password" Margin="Margin.Dense" Variant="Variant.Outlined" InputType="@Password" Adornment="Adornment.End" AdornmentIcon="@PasswordIcon" OnAdornmentClick="ShowPassword" AdornmentAriaLabel="Show Password" For="() => _register.Password" />
-                                            <MudTextField Class="pb-4" @bind-Value="_register.ConfirmPassword" Immediate="true" Label="Confirm Password" Margin="Margin.Dense" Variant="Variant.Outlined" InputType="@ConfirmPassword" Adornment="Adornment.End" AdornmentIcon="@ConfirmPasswordIcon" OnAdornmentClick="ShowConfirmPassword" AdornmentAriaLabel="Show Confirm Password" For="() => _register.ConfirmPassword" />
-                                             @if (_errorMessage.Any())
-                                             {
-                                                @foreach(var message in _errorMessage)
-                                                {
-                                                    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="my-2">@message</MudAlert>
-                                                }
-                                             }
-                                            <MudButton Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit"><MudText Typo="Typo.body2">Register</MudText></MudButton>
-                                        </EditForm>
-                                        <MudStack Class="pt-2" Row="false" Justify="Justify.Center" AlignItems="AlignItems.Start">
-                                            <MudLink Underline="Underline.None" Href="/login">Existing user!</MudLink>
-                                        </MudStack>
-                                    </section>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <p style="text-align:center;width: 100%; margin-top: 20px; color: #1f1c2b" class="">PustCSE v.0.1.0, Copyright Ⓒ 2023</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<MudGrid>
+    <MudItem xs="12" sm="6" md="4" lg="3" xl=2 Class="d-flex flex-column gap-3 mx-4">
+        <MudText Style="font-size: 38px;" Typo="Typo.h3" Class="mb-2">Register</MudText>
+        <EditForm Model="@_register" OnValidSubmit="Submit" Enhance>
+            <DataAnnotationsValidator />
+            <MudTextField Class="pb-4" @bind-Value="_register.Email" Immediate="true" Label="Email" Variant="Variant.Outlined" Margin="Margin.Dense" For="() => _register.Email" />
+            <MudTextField Class="pb-4" @bind-Value="_register.Password" HelperText="Password should contain digit & alphanumeric characters" Immediate="true" Label="Password" Margin="Margin.Dense" Variant="Variant.Outlined" InputType="@Password" Adornment="Adornment.End" AdornmentIcon="@PasswordIcon" OnAdornmentClick="ShowPassword" AdornmentAriaLabel="Show Password" For="() => _register.Password" />
+            <MudTextField Class="pb-4" @bind-Value="_register.ConfirmPassword" Immediate="true" Label="Confirm Password" Margin="Margin.Dense" Variant="Variant.Outlined" InputType="@ConfirmPassword" Adornment="Adornment.End" AdornmentIcon="@ConfirmPasswordIcon" OnAdornmentClick="ShowConfirmPassword" AdornmentAriaLabel="Show Confirm Password" For="() => _register.ConfirmPassword" />
+            @if (_errorMessage.Any())
+            {
+                @foreach (var message in _errorMessage)
+                {
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mb-4">@message</MudAlert>
+                }
+            }
+            <MudButton Color="Color.Primary" Class="py-2 px-6 mt-1" Variant="Variant.Filled" ButtonType="ButtonType.Submit"><MudText Typo="Typo.body2">Register</MudText></MudButton>
+        </EditForm>
+        <MudLink Underline="Underline.None" Href="/login">Log in here!</MudLink>
+    </MudItem>
+</MudGrid>
 
 @code {
     private RegisterRequest _register { get; set; } = new();
@@ -98,7 +76,6 @@
             if (response.IsSuccess)
             {
                 _errorMessage.Clear();
-                _snakBar.Add(response.Message, Severity.Success);
             }
             else
             {

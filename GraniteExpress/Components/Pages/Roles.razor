@@ -1,0 +1,99 @@
+﻿@page "/roles"
+@using Microsoft.AspNetCore.Identity
+@inject IUserService _userService
+
+@attribute [Authorize(Roles = "Admin")]
+
+<PageTitle>Roles</PageTitle>
+
+<MudText Typo="Typo.h5" Class="mb-5">Roles</MudText>
+
+<MudGrid>
+    <MudItem xs="12" Style="float: right;" Class="mr-1">
+        <MudButton Color="Color.Primary" Style="float: right;" Variant="Variant.Filled" OnClick="OpenAddRoleDialog">Add Role</MudButton>
+    </MudItem>
+    <MudItem xs="12">
+        <MudTable Items="roles" >
+            <HeaderContent>
+                <MudTh>Roles</MudTh>
+                <MudTh Style="width:100%;padding-right:25px"><MudText Align="Align.End" Style="width: 100%;">Action</MudText></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Name</MudTd>
+                <MudTd>
+                    <MudItem Class="d-flex gap-2" Style="float:right">
+                        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => EditRoleDialog(context))">Edit</MudButton>
+                        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="@(() => DeleteRole(context))">Delete</MudButton>
+                    </MudItem>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudItem>
+</MudGrid>
+
+@code{
+    // List<UserDto> users = new();
+    List<IdentityRole> roles = new();
+    DialogOptions _dialogOption = new DialogOptions() { MaxWidth = MaxWidth.ExtraSmall, FullWidth = true, DisableBackdropClick = true, CloseButton = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        roles = await _userService.GetRoles();
+    }
+
+    private async Task OpenAddRoleDialog()
+    {
+        var dialog = _dialog.Show<AddRoleDialog>("New Role", _dialogOption);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            if(result.Data is true)
+            {
+                roles = await _userService.GetRoles();
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task EditRoleDialog(IdentityRole role)
+    {
+        var clonedRole = CloneInstance.Clone<IdentityRole>(role);
+        var dialogData = new DialogParameters
+            {
+                ["Role"] = clonedRole
+            };
+        var dialog = _dialog.Show<EditRoleDialog>("Edit Role", dialogData, _dialogOption);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            if (result.Data is true)
+            {
+                roles = await _userService.GetRoles();
+                StateHasChanged();
+            }
+        }
+    }
+
+    public async Task DeleteRole(IdentityRole role)
+    {
+        DialogOptions deleteDialogOption = new DialogOptions() { MaxWidth = MaxWidth.ExtraSmall, FullWidth = true, DisableBackdropClick = true, CloseButton = true };
+        var dialog = _dialog.Show<DeleteDialog>("Delete Role", deleteDialogOption);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            var response = await _userService.DeleteRole(role);
+            if (response)
+            {
+                roles.Remove(role);
+                _snakBar.Add("User is deleted successfully.", Severity.Success);
+                StateHasChanged();
+            }
+            else
+            {
+                _snakBar.Add("User deletion failed.", Severity.Error);
+            }
+        }
+    }
+}

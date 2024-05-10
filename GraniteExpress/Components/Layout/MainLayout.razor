@@ -14,7 +14,7 @@
         <NavMenu/>
     </MudDrawer>
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="pa-7">
+        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="px-10 py-7">
             @Body
         </MudContainer>
     </MudMainContent>
@@ -29,21 +29,25 @@
         _drawerOpen = !_drawerOpen;
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            var state = await _authStateProvider.GetAuthenticationStateAsync();
-            var user = state.User;
+            try
+            {
+                var state = await _authStateProvider.GetAuthenticationStateAsync();
+                var user = state.User;
+                if (user is not null && user.Identity.IsAuthenticated)
+                {
+                    var userId = user.GetUserId();
+                    var userName = user.GetUserName();
+                    _currentUser.SetState(userId, userName);
+                }
+            }
+            catch
+            {
 
-            var userId = user.GetUserId();
-            var userName = user.GetUserName();
-
-            _currentUser.SetState(userId, userName);
-        }
-        catch
-        {
-
+            }
         }
     }
 

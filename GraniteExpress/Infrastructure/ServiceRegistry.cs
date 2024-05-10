@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using MudBlazor.Services;
 
 namespace GraniteExpress.Infrastructure
@@ -25,6 +26,7 @@ namespace GraniteExpress.Infrastructure
                     .AddScoped<IClientService, ClientService>()
                     .AddScoped<IDocumentService, DocumentService>()
                     .AddScoped<ITemplateService, TemplateService>()
+                    .AddScoped<ICashFlowService, CashFlowService>()
                     .AddScoped<IAuthenticationService, AuthenticationService>()
                     .AddScoped<IUserService, UserService>()
                     .AddScoped<CurrentUserState>()
@@ -81,6 +83,23 @@ namespace GraniteExpress.Infrastructure
                        UserId = adminUser.Id,
                        RoleId = adminRoleId
                    });
+
+
+                List<IdentityRoleClaim<string>> adminClaims = new();
+
+                foreach (var component in AppSettings.ComponentsDetails.Keys)
+                {
+                    adminClaims.Add(
+                        new()
+                        {
+                            RoleId = adminRoleId,
+                            ClaimType = component + "Permission",
+                            ClaimValue = component
+                        }    
+                    );
+                }
+                dbContext.RoleClaims.AddRange(adminClaims);
+
 
                 dbContext.SaveChanges();
             }

@@ -4,6 +4,7 @@ using GraniteExpress.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GraniteExpress.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240510070803_UserReferenceAndDeleteBehaviour")]
+    partial class UserReferenceAndDeleteBehaviour
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,30 +93,6 @@ namespace GraniteExpress.Migrations
                     b.HasKey("AccountTypeId");
 
                     b.ToTable("RefAccountType");
-                });
-
-            modelBuilder.Entity("GraniteExpress.Models.CashFlow", b =>
-                {
-                    b.Property<int>("CashFlowId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CashFlowId"));
-
-                    b.Property<string>("CashFlowDescription")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<bool>("IsVisible")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CashFlowId");
-
-                    b.ToTable("RefCashFlow");
                 });
 
             modelBuilder.Entity("GraniteExpress.Models.Client", b =>
@@ -292,8 +271,6 @@ namespace GraniteExpress.Migrations
                     b.HasKey("JournalDetailId");
 
                     b.HasIndex("AccountId");
-
-                    b.HasIndex("CashFlowId");
 
                     b.HasIndex("ClientId");
 
@@ -629,11 +606,6 @@ namespace GraniteExpress.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("GraniteExpress.Models.CashFlow", "CashFlow")
-                        .WithMany("JournalDetails")
-                        .HasForeignKey("CashFlowId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("GraniteExpress.Models.Client", null)
                         .WithMany("JournalDetail")
                         .HasForeignKey("ClientId");
@@ -645,8 +617,6 @@ namespace GraniteExpress.Migrations
                         .IsRequired();
 
                     b.Navigation("Account");
-
-                    b.Navigation("CashFlow");
 
                     b.Navigation("Journal");
                 });
@@ -734,11 +704,6 @@ namespace GraniteExpress.Migrations
             modelBuilder.Entity("GraniteExpress.Models.AccountType", b =>
                 {
                     b.Navigation("Accounts");
-                });
-
-            modelBuilder.Entity("GraniteExpress.Models.CashFlow", b =>
-                {
-                    b.Navigation("JournalDetails");
                 });
 
             modelBuilder.Entity("GraniteExpress.Models.Client", b =>

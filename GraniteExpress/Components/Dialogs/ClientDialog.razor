@@ -1,7 +1,7 @@
 ﻿@inject IClientService _clientService
 <MudDialog>
     <DialogContent>
-        <MudTable Items="Clients" @ref=mudtable @bind-SelectedItem="SelectedClient" Class="mb-5">
+@*         <MudTable Items="Clients" @ref=mudtable @bind-SelectedItem="SelectedClient" Class="mb-5" HeaderClass="detailsHeader" Dense>
             <HeaderContent>
                 <MudTh>Client Name</MudTh>
                 <MudTh>Client Code</MudTh>
@@ -20,7 +20,37 @@
                     </MudItem>
                 </MudTd>
             </RowTemplate>
-        </MudTable>
+        </MudTable> *@
+
+
+        <MudDataGrid T="Client" Items="@Clients" FilterMode=DataGridFilterMode.ColumnFilterRow FilterCaseSensitivity=DataGridFilterCaseSensitivity.CaseInsensitive SortMode="SortMode.Multiple" Dense=true Filterable="true" Class="mb-5">
+            <Columns>
+                <PropertyColumn Property="x => x.ClientCode">
+                    <CellTemplate>
+                        <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(context.Item))>
+                            <MudTextField Value="@context.Item.ClientCode" ReadOnly Margin="Margin.Dense"></MudTextField>
+                        </MudItem>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.ClientFirstName" Title="First Name">
+                    <CellTemplate>
+                        <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(context.Item))>
+                            <MudTextField Value="@context.Item.ClientFirstName" ReadOnly Margin="Margin.Dense"></MudTextField>
+                        </MudItem>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.ClientFirstName" Title="Last Name">
+                    <CellTemplate>
+                        <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(context.Item))>
+                            <MudTextField Value="@context.Item.ClientLastName" ReadOnly Margin="Margin.Dense"></MudTextField>
+                        </MudItem>
+                    </CellTemplate>
+                </PropertyColumn>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="Client"/>
+            </PagerContent>
+        </MudDataGrid>
     </DialogContent>
 </MudDialog>
 
@@ -35,6 +65,10 @@
 
     .mud-input.mud-input-underline:hover:not(.mud-disabled)::before {
         border-bottom: none;
+    }
+
+    .detailsHeader {
+        background: #4b4b57;
     }
 </style>
 

@@ -1,24 +1,19 @@
 ﻿@inject ITemplateService _templateService
 <MudDialog>
     <DialogContent>
-        <MudTable Items="Templates" @ref=mudtable @bind-SelectedItem="SelectedTemplate" Class="mb-5">
+        <MudTable Items="Templates" @ref=mudtable @bind-SelectedItem="SelectedTemplate" Class="mb-5" Dense Bordered Striped Elevation="5">
             <RowTemplate>
                 <MudTd>
                     <MudItem Style="min-height:40px;" @ondblclick=@(() => RowSelected(@context)) @onclick=@(() => TemplateDetailsChanged(@context))>
                         <MudTextField Value="@context.TemplateName" ReadOnly Margin="Margin.Dense"></MudTextField>
                     </MudItem>
                 </MudTd>
-  @*               <MudTd>
-                    <MudItem Style="min-height:40px;" @ondblclick=@(() => RowSelected(@context)) @onclick=@(() => TemplateDetailsChanged(@context))>
-                        <MudTextField Value="@context.templa" ReadOnly Margin="Margin.Dense"></MudTextField>
-                    </MudItem>
-                </MudTd> *@
             </RowTemplate>
         </MudTable>
 
         @if(SelectedTemplate.TemplateId != 0)
         {
-            <MudTable Class="mt-4 mb-5" Bordered Items="SelectedTemplate.TemplateDetail" HeaderClass="detailsHeader" >
+            <MudTable Class="mt-4 mb-5" Bordered Items="SelectedTemplate.TemplateDetail" HeaderClass="detailsHeader" Dense>
                 <HeaderContent>
                     <MudTh>Account Name</MudTh>
                     <MudTh>Account Code</MudTh>

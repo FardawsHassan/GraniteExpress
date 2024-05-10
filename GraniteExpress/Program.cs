@@ -23,6 +23,17 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 //    .AddSignInManager()
 //    .AddDefaultTokenProviders();
 
+
+builder.Services.AddAuthorization(options =>
+{
+    foreach (var component in AppSettings.ComponentsDetails.Keys)
+    {
+        options.AddPolicy(component, policy => policy.RequireClaim(component+"Permission"));
+    }
+});
+
+
+
 builder.Services.AddAuthenticationCore()
                 .AddDbContext<ApplicationDbContext>(options =>
                 {

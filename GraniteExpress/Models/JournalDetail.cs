@@ -22,5 +22,6 @@ namespace GraniteExpress.Models
         
         public Journal Journal { get; set; }
         public Account Account { get; set; }
+        public CashFlow CashFlow { get; set; }
     }
 }

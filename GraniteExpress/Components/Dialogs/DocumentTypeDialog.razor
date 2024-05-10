@@ -1,7 +1,7 @@
 ﻿@inject IDocumentService _documentTypeService
 <MudDialog>
     <DialogContent>
-        <MudTable Items="DocumentTypes" @ref=mudtable @bind-SelectedItem="SelectedDocumentType" Class="mb-5">
+        <MudTable Items="DocumentTypes" @ref=mudtable @bind-SelectedItem="SelectedDocumentType" Class="mb-5" Dense>
             <HeaderContent>
                 <MudTh>Name</MudTh>
                 <MudTh>Code</MudTh>

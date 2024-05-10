@@ -2,7 +2,7 @@
 
 <MudDialog>
     <DialogContent>
-        <MudTable Items="Accounts" @ref=_mudTable Class="mb-5">
+@*         <MudTable Items="Accounts" @ref=_mudTable Class="mb-5" Dense>
             <HeaderContent>
                 <MudTh>Account Name</MudTh>
                 <MudTh>Account Code</MudTh>
@@ -19,7 +19,31 @@
                     </MudItem>
                 </MudTd>
             </RowTemplate>
-        </MudTable>
+        </MudTable> *@
+
+
+
+        <MudDataGrid T="Account" Items="@Accounts" FilterMode=DataGridFilterMode.ColumnFilterRow  FilterCaseSensitivity=DataGridFilterCaseSensitivity.CaseInsensitive SortMode="SortMode.Multiple" Dense=true Filterable="true" Class="mb-5">
+            <Columns>
+                <PropertyColumn Property="x => x.AccountCode" Title="Code">
+                    <CellTemplate>
+                        <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(context.Item))>
+                            <MudTextField Value="@context.Item.AccountCode" ReadOnly Margin="Margin.Dense"></MudTextField>
+                        </MudItem>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.AccountName">
+                    <CellTemplate>
+                        <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(context.Item))>
+                            <MudTextField Value="@context.Item.AccountName" ReadOnly Margin="Margin.Dense"></MudTextField>
+                        </MudItem>
+                    </CellTemplate>
+                </PropertyColumn>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="Account" />
+            </PagerContent>
+        </MudDataGrid>
     </DialogContent>
 </MudDialog>
 

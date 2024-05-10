@@ -1,0 +1,101 @@
+﻿@page "/users"
+@using Microsoft.AspNetCore.Identity
+@inject IUserService _userService
+
+@attribute [Authorize(Roles = "Admin")]
+
+<PageTitle>Users</PageTitle>
+
+<MudText Typo="Typo.h5" Class="mb-5">Users</MudText>
+
+<MudGrid>
+    <MudItem xs="12" Style="float: right;" Class="mr-1">
+        <MudButton Color="Color.Primary" Style="float: right;" Variant="Variant.Filled" OnClick="OpenAddUserDialog">Add Users</MudButton>
+    </MudItem>
+    <MudItem xs="12">
+        <MudTable Items="users">
+            <HeaderContent>
+                <MudTh>Email</MudTh>
+                <MudTh>Role</MudTh>
+                <MudTh Style="width:100%;padding-right:25px"><MudText Align="Align.End" Style="width: 100%;">Action</MudText></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Email</MudTd>
+                <MudTd>@context.UserRole</MudTd>
+                <MudTd>
+                    <MudItem Class="d-flex gap-2" Style="float:right">
+                        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => EditAddUserDialog(context))">Change Role</MudButton>
+                        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="@(() => DeleteUser(context))">Delete</MudButton>
+                    </MudItem>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudItem>
+</MudGrid>
+
+@code {
+    List<UserDto> users = new();
+    DialogOptions _dialogOption = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true, CloseButton = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await _userService.GetUsers();
+    }
+
+    private async Task OpenAddUserDialog()
+    {
+        var dialog = _dialog.Show<AddUserDialog>("Add User", _dialogOption);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var user = result.Data as UserDto;
+            if (user is not null)
+            {
+                users.Add(user);
+            }
+        }
+    }
+
+    private async Task EditAddUserDialog(UserDto user)
+    {
+        var clonedUser = CloneInstance.Clone<UserDto>(user);
+        var dialogData = new DialogParameters
+            {
+                ["User"] = clonedUser
+            };
+        var dialog = _dialog.Show<AddUserDialog>("Change Role", dialogData, _dialogOption);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var updatedUser = result.Data as UserDto;
+            if (updatedUser is not null)
+            {
+                user.UserRole = updatedUser.UserRole;
+                StateHasChanged();
+            }
+        }
+    }
+    public async Task DeleteUser(UserDto user)
+    {
+        DialogOptions deleteDialogOption = new DialogOptions() { MaxWidth = MaxWidth.ExtraSmall, FullWidth = true, DisableBackdropClick = true, CloseButton = true };
+        var dialog = _dialog.Show<DeleteDialog>("Delete User", deleteDialogOption);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            var response = await _userService.DeleteUser(user);
+            if (response)
+            {
+                users.Remove(user);
+                _snakBar.Add("User is deleted successfully.", Severity.Success);
+                StateHasChanged();
+            }
+            else
+            {
+                _snakBar.Add("User deletion failed.", Severity.Error);
+            }
+        }
+    }
+}
+

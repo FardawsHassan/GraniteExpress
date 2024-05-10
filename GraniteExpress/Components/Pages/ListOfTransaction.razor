@@ -1,0 +1,86 @@
+﻿@page "/listoftransaction"
+@inject IJournalService _journalService
+
+
+<MudItem xs=6 Class="d-flex gap-4 mb-6 mt-4">
+    <MudDateRangePicker Variant=Variant.Outlined PickerVariant=PickerVariant.Inline @bind-DateRange="@_dateRange" Class="mr-3" Margin="Margin.Dense" />
+    <MudButton OnClick="GetSeletJournals" Class="px-6" Variant="Variant.Filled" Color="Color.Primary">GetJournals</MudButton>
+</MudItem>
+
+<MudDataGrid T="SelectJournalView" Items="@JournalViews" FilterMode=DataGridFilterMode.ColumnFilterRow FilterCaseSensitivity=DataGridFilterCaseSensitivity.CaseInsensitive SortMode="SortMode.Multiple" Dense=true Filterable="true" Class="mb-5">
+    <Columns>
+        <PropertyColumn Property="x => x.DocumentNo" Title="Document No">
+            <CellTemplate>
+                @context.Item.DocumentNo
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.DocumentDate" Title="Document Date">
+            <CellTemplate>
+                @if(context.Item.DocumentDate is not null)
+                {
+                    @context.Item.DocumentDate.Value.ToString("yyyy/MM/dd")
+                }
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.ExchangeRate" Title="Exchange Rate">
+            <CellTemplate>
+                @context.Item.ExchangeRate
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.CurrencyAmount" Title="Currency Amount">
+            <CellTemplate>
+                @context.Item.CurrencyAmount
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.AccountId" Title="Account Id">
+            <CellTemplate>
+                @context.Item.AccountId
+            </CellTemplate>
+        </PropertyColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="SelectJournalView" />
+    </PagerContent>
+</MudDataGrid>
+
+<style>
+    .mud-input.mud-input-underline::after {
+        border-bottom: none;
+    }
+
+    .mud-input.mud-input-underline::before {
+        border-bottom: none;
+    }
+
+    .mud-input.mud-input-underline:hover:not(.mud-disabled)::before {
+        border-bottom: none;
+    }
+
+    .detailsHeader {
+        background: #4b4b57;
+    }
+</style>
+
+@code {
+    List<SelectJournalView> JournalViews = new();
+    private DateRange _dateRange { get; set; }
+
+    protected async Task GetSeletJournals()
+    {
+        if(_dateRange.Start is null)
+        {
+            _snakBar.Add("Please select start date.", Severity.Error);
+        }
+        if(_dateRange.End is null)
+        {
+            _snakBar.Add("Please select end date.", Severity.Error);
+        }
+        else
+        {
+            JournalViews = _journalService.JournalSelect(_dateRange.Start, _dateRange.End);
+        }
+
+    }
+
+
+}

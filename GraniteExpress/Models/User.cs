@@ -6,5 +6,7 @@ namespace GraniteExpress.Models
     {
         public string? FullName { get; set; }
         public string? LastName { get; set; }
+
+        public List<Journal> Journals { get; set; }
     }
 }

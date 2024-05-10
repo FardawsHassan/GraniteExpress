@@ -1,0 +1,60 @@
+﻿@using Microsoft.AspNetCore.Identity
+@attribute [AllowAnonymous]
+@inject IUserService _userService
+
+<MudDialog>
+    <DialogContent>
+        <MudItem xs="12" Class="d-flex flex-column gap-3 mx-4 pa-5">
+            <MudTextField Class="" @bind-Value=SelectedRole Label="Role" Variant="Variant.Outlined" />
+            <MudItem>
+                <MudButton Style="width: 80px;height: 40px;float:right;" Color="Color.Primary" Class="py-2 px-6 mt-1" Variant="Variant.Filled" OnClick="Submit"><MudText Typo="Typo.body2">Save</MudText></MudButton>
+            </MudItem>
+        </MudItem>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    string? SelectedRole = string.Empty;
+    List<IdentityRole> Roles = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Roles = await _userService.GetRoles();
+    }
+
+    private async Task Submit()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(SelectedRole))
+            {
+                _snakBar.Add("Please insert a role", Severity.Error);
+            }
+            else if(Roles.Any(x => x.NormalizedName == SelectedRole.ToUpper()))
+            {
+                _snakBar.Add("Role already exists.", Severity.Error);
+
+            }
+            else
+            {
+                var response = await _userService.AddRole(SelectedRole);
+                if (response is true)
+                {
+                    _snakBar.Add("Role added successfully", Severity.Success);
+                    MudDialog.Close(DialogResult.Ok(response));
+                }
+                else
+                {
+                    _snakBar.Add("Something went wrong", Severity.Error);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _snakBar.Add(ex.Message, Severity.Error);
+        }
+    }
+}

@@ -1,0 +1,137 @@
+﻿@using Microsoft.AspNetCore.Identity
+@attribute [AllowAnonymous]
+@inject IUserService _userService
+
+<MudDialog>
+    <DialogContent>
+        <MudItem xs="12" Class="d-flex flex-column gap-3 mx-4 pa-5">
+            <EditForm Model="@_register" OnValidSubmit="Submit" Enhance>
+                <DataAnnotationsValidator />
+                @if (string.IsNullOrEmpty(User.Id))
+                {
+                    <MudTextField Class="pb-4" @bind-Value="_register.Email" Immediate="true" Label="Email" Variant="Variant.Outlined" Margin="Margin.Dense" For="() => _register.Email" />
+                }
+                @* <MudTextField Class="pb-4" @bind-Value="_register.Password" HelperText="Password should contain digit & alphanumeric characters" Immediate="true" Label="Password" Margin="Margin.Dense" Variant="Variant.Outlined" InputType="@Password" Adornment="Adornment.End" AdornmentIcon="@PasswordIcon" OnAdornmentClick="ShowPassword" AdornmentAriaLabel="Show Password" For="() => _register.Password" /> *@
+                <MudSelect Class="pb-4" @bind-Value=_register.Role Label="Roles" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @foreach (var role in Roles)
+                    {
+                        <MudSelectItem Value="@role.Name">@role.Name</MudSelectItem>
+                    }
+                </MudSelect>
+
+                @* <MudTextField Class="pb-4" @bind-Value="_register." Immediate="true" Label="Confirm Password" Margin="Margin.Dense" Variant="Variant.Outlined" InputType="@ConfirmPassword" Adornment="Adornment.End" AdornmentIcon="@ConfirmPasswordIcon" OnAdornmentClick="ShowConfirmPassword" AdornmentAriaLabel="Show Confirm Password" For="() => _register.Role" /> *@
+                @if (_errorMessage.Any())
+                {
+                    @foreach (var message in _errorMessage)
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mb-4">@message</MudAlert>
+                    }
+                }
+                <MudButton Color="Color.Primary" Class="py-2 px-6 mt-1" Variant="Variant.Filled" ButtonType="ButtonType.Submit"><MudText Typo="Typo.body2">Save</MudText></MudButton>
+            </EditForm>
+        </MudItem>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public UserDto User { get; set; } = new();
+
+    public AddUserRequest _register { get; set; } = new();
+    List<IdentityRole> Roles = new();
+
+    private bool isShowPassword { get; set; } = false;
+    private InputType Password = InputType.Password;
+    private string PasswordIcon = Icons.Material.Filled.VisibilityOff;
+
+    private bool isShowConfirmPassword { get; set; } = false;
+    private InputType ConfirmPassword = InputType.Password;
+    private string ConfirmPasswordIcon = Icons.Material.Filled.VisibilityOff;
+
+    private List<string> _errorMessage { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Roles = await _userService.GetRoles();
+        if (!string.IsNullOrEmpty(User.Id))
+        {
+            _register.Email = User.Email;
+            _register.Role = User.UserRole;
+        }
+    }
+
+
+    private void ShowPassword()
+    {
+        @if (isShowPassword)
+        {
+            isShowPassword = false;
+            PasswordIcon = Icons.Material.Filled.VisibilityOff;
+            Password = InputType.Password;
+        }
+        else
+        {
+            isShowPassword = true;
+            PasswordIcon = Icons.Material.Filled.Visibility;
+            Password = InputType.Text;
+        }
+    }
+
+    private void ShowConfirmPassword()
+    {
+        @if (isShowConfirmPassword)
+        {
+            isShowConfirmPassword = false;
+            ConfirmPasswordIcon = Icons.Material.Filled.VisibilityOff;
+            ConfirmPassword = InputType.Password;
+        }
+        else
+        {
+            isShowConfirmPassword = true;
+            ConfirmPasswordIcon = Icons.Material.Filled.Visibility;
+            ConfirmPassword = InputType.Text;
+        }
+    }
+
+    private async Task Submit()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(User.Id))
+            {
+                var response = await _userService.AddUser(_register);
+                if (response is not null)
+                {
+                    _snakBar.Add("User added successfully", Severity.Success);
+                    MudDialog.Close(DialogResult.Ok(response));
+                }
+                else
+                {
+                    _snakBar.Add("Something went wrong", Severity.Error);
+                }
+            }
+            else
+            {
+                User.Email = _register.Email;
+                User.UserRole = _register.Role;
+                var response = await _userService.UpdateUser(User);
+                if(response is not null)
+                {
+                    _snakBar.Add("User added successfully", Severity.Success);
+                    MudDialog.Close(DialogResult.Ok(User));
+                }
+                else
+                {
+                    _snakBar.Add("Something went wrong", Severity.Error);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _snakBar.Add(ex.Message, Severity.Error);
+        }
+    }
+}

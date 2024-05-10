@@ -7,8 +7,8 @@ namespace GraniteExpress.Helper
         public static string GetUserName(this ClaimsPrincipal claimsPrincipal) =>
             claimsPrincipal.FindFirstValue<string>(ClaimTypes.Name);
 
-        public static int GetUserId(this ClaimsPrincipal claimsPrincipal) =>
-            claimsPrincipal.FindFirstValue<int>(ClaimTypes.NameIdentifier);
+        public static string GetUserId(this ClaimsPrincipal claimsPrincipal) =>
+            claimsPrincipal.FindFirstValue<string>(ClaimTypes.NameIdentifier);
     }
 
     public static class PrincipalExtensions
@@ -19,6 +19,12 @@ namespace GraniteExpress.Helper
             {
                 var claim = principal.FindFirst(claimType);
                 return (T)Convert.ChangeType(claim.Value, typeof(T));
+
+                //if (claim is not null)
+                //{
+                //    return (T)Convert.ChangeType(claim.Value, typeof(T));
+                //}
+                //return default(T);
             }
             catch
             {

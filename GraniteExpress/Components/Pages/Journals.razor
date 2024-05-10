@@ -1,10 +1,12 @@
 ﻿@page "/transaction"
+@using GraniteExpress.Helper
 @inject IJournalService _journalService
 @inject IAccountService _AccountService
 @inject ICurrencyService _currencyService
 @inject IClientService _clientService
 @inject IDocumentService _documentService
 @inject ITemplateService _templateService
+@inject ICashFlowService _cashFlowService
 
 <PageTitle>Transaction</PageTitle>
 
@@ -34,27 +36,24 @@
             <MudGrid>
                 <MudItem xs="4" @onclick=@(() => OpenDocumentTypeSelectDialog())>
                     @{
-                        var documentType = DocumentTypes.Where(x => x.DocumentTypeId == Journal.DocumentTypeId).FirstOrDefault();
-                        <MudTextField Error="@documentTypeError" ErrorText="Document Type is required" Label="Select Document Type" Variant=Variant.Outlined Value="@(documentType is not null ? documentType.DocumentName : null)" ReadOnly Margin="Margin.Dense"></MudTextField>
+                        <MudTextField @ref=@_documentTypeField Error="@documentTypeError" ErrorText="Document Type is required" Label="Select Document Type" Variant=Variant.Outlined Value="@(" ")" ReadOnly Margin="Margin.Dense"></MudTextField>
                     }
                 </MudItem>
                 <MudItem xs="4" @onclick=@(() => OpenTemplateSelectDialog())>
                     @{
-                        var template = Templates.Where(x => x.TemplateId == Journal.TemplateId).FirstOrDefault();
-                        <MudTextField Label="Select Template" Variant=Variant.Outlined Value="@(template is not null ? template.TemplateName : null )" ReadOnly Margin="Margin.Dense"></MudTextField>
+                        <MudTextField Label="Select Template" @ref=@_TemplateField Variant=Variant.Outlined Value="@(" ")" ReadOnly Margin="Margin.Dense"></MudTextField>
                     }
                 </MudItem>
                 <MudItem xs="4" Style="min-height:40px;" @onclick=@(() => OpenJournalClientSelectDialog())>
                     @{
-                        var client = Clients.Where(x => x.ClientId == Journal.ClientId).FirstOrDefault();
-                        <MudTextField Error="@clientError" ErrorText="Client is required" Label="Select Client" Variant=Variant.Outlined Value="@(client is not null ? client.ClientFirstName+" "+client.ClientLastName : null)" ReadOnly Margin="Margin.Dense"></MudTextField>
+                        <MudTextField Error="@clientError" @ref=@_JournalClientField ErrorText="Client is required" Label="Select Client" Variant=Variant.Outlined Value="@(" ")" ReadOnly Margin="Margin.Dense"></MudTextField>
                     }
                 </MudItem>
             </MudGrid>
         </EditForm>
     </MudItem>
     <MudItem xs="12">
-        <MudTable Bordered=true Outlined CustomFooter=true FooterClass="table-foot-bordered" Items="Journal.JournalDetail" @ref=JournalDetailTable Class="mt-2" FixedHeader Dense>
+        <MudTable Bordered=true Outlined Square=false CustomFooter=true FooterClass="table-foot-bordered" Items="Journal.JournalDetail" @ref=JournalDetailTable Class="mt-2" FixedHeader Dense>
             <HeaderContent>
                 <MudTh></MudTh>
                 <MudTh>Account Code</MudTh>
@@ -181,7 +180,12 @@
                     }
                 </MudTd>
                 <MudTd DataLabel="Cash Flow">
-
+                    <MudItem Style="min-height:40px;" @onclick=@(() => OpenCashFlowSelectDialog(context))>
+                        @{
+                            var cashFlow = CashFlows.Where(x => x.CashFlowId == context.CashFlowId).FirstOrDefault();
+                            <MudTextField Value="@(cashFlow is not null ? cashFlow.CashFlowDescription : " ")" ReadOnly Margin="Margin.Dense"></MudTextField>
+                        }
+                    </MudItem>
                 </MudTd>
             </RowTemplate>
             <FooterContent>
@@ -220,6 +224,31 @@
     .mud-input.mud-input-underline:hover:not(.mud-disabled)::before {
         border-bottom: none;
     }
+
+    .mud-input-control > .mud-input-control-input-container > div.mud-input.mud-input-text {
+        margin-top: 0 !important;
+    }
+
+    .mud-table-dense * .mud-table-row td.mud-table-cell {
+        padding: 0 !important;
+        padding-inline-start: 0 !important;
+        padding-inline-end: 0 !important;
+    }
+
+    .mud-table-cell .mud-input > input.mud-input-root {
+        height: 45px !important;
+        padding: 0 !important;
+        text-align: center;
+    }
+    
+    th{
+        text-align: center !important;
+        padding: 10px !important;
+    }
+
+    .mud-table-cell .mud-checkbox {
+        margin: auto;
+    }
 </style>
 
 @code {
@@ -234,36 +263,37 @@
     List<Account> Accounts = new();
     List<Client> Clients = new();
     List<Currency> Currencies = new();
+    List<CashFlow> CashFlows = new();
 
     MudTable<JournalDetail> JournalDetailTable = new();
+    MudTextField<string> _documentTypeField = new();
+    MudTextField<string> _TemplateField = new();
+    MudTextField<string> _JournalClientField = new();
     public DateTime? journalDate = DateTime.UtcNow;
     bool clientError = false;
     bool documentTypeError = false;
 
     protected override async Task OnInitializedAsync()
     {
-        var journalviews = _journalService.GetJournalViews();
-
         Accounts = await _AccountService.GetAccounts();
         Currencies = await _currencyService.GetCurrencies();
         Clients = await _clientService.GetClients();
         DocumentTypes = await _documentService.GetDocumentTypes();
         Templates = await _templateService.GetTemplates();
-
-        //JournalList = await _journalService.GetJournals();
-        //Journal = JournalList.FirstOrDefault();
-        journalDate = Journal is null ? DateTime.UtcNow : Journal.DocumentDate;
-        Journal = Journal ?? new();
-        Journal.JournalDetail = Journal.JournalDetail ?? new();
+        CashFlows = await _cashFlowService.GetCashFlows();
+        journalDate = DateTime.UtcNow;
+        Journal = new();
+        Journal.UserId = "tempId";
+        // Journal.UserId = _currentUser.UserId;
+        Journal.JournalDetail = new();
         Journal.JournalDetail.Add(new());
     }
 
 
     private async Task OnValidSubmit(EditContext context)
     {
+        Journal.UserId = await _localStorageService.GetItemAsync<string>(key: "AuthKey");
         Journal.DocumentDate = journalDate ?? DateTime.UtcNow;
-        Random rnd = new();
-        Journal.UserId = rnd.Next(0, 1000000);
         var lastJournal = Journal.JournalDetail.Last();
         Journal.JournalDetail.Remove(lastJournal);
         bool isValid = context.Validate();
@@ -278,9 +308,12 @@
                 var creditAmount = Journal.JournalDetail.Where(x => x.IsDebit == false).Sum(s => s.CurrencyAmount * s.ExchangeRate);
                 if (debitAmount == creditAmount)
                 {
-                    var response = await _journalService.SaveJournal(Journal);
-                    if (response is not null)
+                    var cloneJournal = CloneInstance.Clone<Journal>(Journal);
+                    var response = await _journalService.SaveJournal(cloneJournal);
+                    if (response is true)
                     {
+                        await OnInitializedAsync();
+                        StateHasChanged();
                         _snakBar.Add("Transaction Added Succesfully.", Severity.Success);
                     }
                     else
@@ -291,10 +324,10 @@
                 else
                 {
                     _snakBar.Add("Debit and Credit amount are not equal.", Severity.Error);
+                    Journal.JournalDetail.Add(new());
                 }
             }
         }
-        Journal.JournalDetail.Add(lastJournal);
     }
 
     private async Task OpenAccountSelectDialog(JournalDetail journalDetail)
@@ -366,6 +399,20 @@
         StateHasChanged();
     }
 
+
+    private async Task OpenCashFlowSelectDialog(JournalDetail journalDetail)
+    {
+        var dialog = _dialog.Show<AddCashFlowDialog>("Select Cash Flow", _dialogOption);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var cashFlow = result.Data as CashFlow;
+            JournalDetailTable.SelectedItem.CashFlowId = cashFlow.CashFlowId;
+        }
+        StateHasChanged();
+    }
+
     private async Task OpenJournalClientSelectDialog()
     {
         var dialog = _dialog.Show<ClientDialog>("Select Client", _dialogOption);
@@ -376,6 +423,7 @@
             var client = result.Data as Client;
             Journal.ClientId = client.ClientId;
             clientError = false;
+            await _JournalClientField.SetText(client.ClientFirstName+" "+client.ClientLastName);
         }
         StateHasChanged();
     }
@@ -391,6 +439,7 @@
             var documentType = result.Data as DocumentType;
             Journal.DocumentTypeId = documentType.DocumentTypeId;
             documentTypeError = false;
+            await _documentTypeField.SetText(documentType.DocumentName);
         }
         StateHasChanged();
     }
@@ -412,6 +461,7 @@
                     IsDebit = x.IsDebit
                 }));
             Journal.JournalDetail.Add(new());
+            await _TemplateField.SetText(template.TemplateName);
         }
         StateHasChanged();
     }

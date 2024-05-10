@@ -1,50 +1,31 @@
 ﻿@page "/login"
+@using Microsoft.AspNetCore.Authorization
 @attribute [AllowAnonymous]
 @inject IAuthenticationService _authService
 @inject IUserService _userService
 @inject NavigationManager _navigationManager
 
-<div class="" style="display:flex;height: 100vh; overflow: hidden; background-size: cover;">
-    <div class="" style="width:100%;">
-        <div class="container" style="height:100%">
-            <div class="row align-items-center" style="height:100%">
-                <div class="col-12 py-3">
-                    <div class="" style="padding: 0; overflow: hidden; border-radius: 8px !important;">
-                        <div class="container-fluid" style="padding:0px; !important">
-                            <div class="row">
-                                <div class="col-12 col-md-6 p-5 position-relative align-items-center flex-column" style="display: flex; background-color: #147ebb">
-                                    <h2 style="color:white;font-size:38px;" class=" mt-3 mt-md-3 pt-0 pt-md-4 mb-4 d-none d-sm-block">Welcome!</h2>
-                                    <p style="color:white;" class="mb-4 pb-0 pb-md-4 d-none d-sm-block">Please log in in order to proceed.</p>
-                                </div>
-                                <div class="col-12 col-md-6 p-5" style="background-color:ghostwhite">
-                                    <h5 class="mb-4">Login</h5>
-                                    <section>
-                                        <EditForm Model="@_login" OnValidSubmit="Submit" Enhance>
-                                            <DataAnnotationsValidator />
-                                            <MudTextField Class="pb-4" @bind-Value="_login.Email" Immediate="true" Label="Email" Variant="Variant.Outlined" Margin="Margin.Dense" For="() => _login.Email" />
-                                            <MudTextField Class="pb-4" @bind-Value="_login.Password" Immediate="true" Label="Password" Margin="Margin.Dense" Variant="Variant.Outlined" InputType="@Password" Adornment="Adornment.End" AdornmentIcon="@PasswordIcon" OnAdornmentClick="ShowPassword" AdornmentAriaLabel="Show Password" For="() => _login.Password" />
-                                            @if (_errorMessage.Any())
-                                            {
-                                                @foreach (var message in _errorMessage)
-                                                {
-                                                    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="my-2">@message</MudAlert>
-                                                }
-                                            }
-                                            <MudButton Color="Color.Primary" FullWidth="true" Variant="Variant.Filled" ButtonType="ButtonType.Submit"><MudText Typo="Typo.body2">Login</MudText></MudButton>
-                                        </EditForm>
-                                        <MudStack Class="pt-2" Row="false" Justify="Justify.Center" AlignItems="AlignItems.Start">
-                                            <MudLink Underline="Underline.None" Href="/register">New user!</MudLink>
-                                        </MudStack>
-                                    </section>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<MudGrid>
+    <MudItem xs="12" sm="6" md="4" lg="3" xl=2 Class="d-flex flex-column gap-3 mx-4">
+        <MudText Style="font-size: 38px;" Typo="Typo.h3" Class="mb-2">Log In</MudText>
+        <EditForm Model="@_login" OnValidSubmit="Submit" Enhance>
+            <DataAnnotationsValidator />
+            <MudItem>
+                <MudTextField Class="pb-4" @bind-Value="_login.Email" Immediate="true" Label="Email" Variant="Variant.Outlined" Margin="Margin.Dense" For="() => _login.Email" />
+                <MudTextField Class="pb-4" @bind-Value="_login.Password" Immediate="true" Label="Password" Margin="Margin.Dense" Variant="Variant.Outlined" InputType="@Password" Adornment="Adornment.End" AdornmentIcon="@PasswordIcon" OnAdornmentClick="ShowPassword" AdornmentAriaLabel="Show Password" For="() => _login.Password" />
+                @if (_errorMessage.Any())
+                {
+                    @foreach (var message in _errorMessage)
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="my-2">@message</MudAlert>
+                    }
+                }
+                <MudButton Color="Color.Primary" Class="py-2 mt-1" Variant="Variant.Filled" ButtonType="ButtonType.Submit"><MudText Typo="Typo.body2">Login</MudText></MudButton>
+            </MudItem>
+        </EditForm>
+        <MudLink Underline="Underline.None" Href="/register">Register here!</MudLink>
+    </MudItem>
+</MudGrid>
 
 @code {
     [CascadingParameter]
@@ -98,7 +79,7 @@
             {
                 await ((AuthStateProvider)_authStateProvider).SetStateAsync(response.UserId);
                 _errorMessage.Clear();
-                _snakBar.Add(response.Message, Severity.Success);
+                _navigationManager.NavigateTo("/transaction");
             }
             else
             {

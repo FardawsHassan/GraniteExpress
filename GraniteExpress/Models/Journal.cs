@@ -18,7 +18,7 @@ namespace GraniteExpress.Models
         [Required]
         public DateTime DocumentDate { get; set; }
         [Required]
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         [Required]
         public bool IsDelete { get; set; } = false;
 
@@ -27,5 +27,6 @@ namespace GraniteExpress.Models
         public DocumentType DocumentType { get; set; }
         public Template Template { get; set; }
         public Client Client { get; set; }
+        public User User { get; set; }
     }
 }
