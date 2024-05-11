@@ -42,12 +42,23 @@ namespace GraniteExpress.Services
         {
             try
             {
-                var journal =  _context.GenJournal.Where(j => j.JournalId == journalId).AsNoTracking().FirstOrDefault();
-                _context.Entry(journal).State = EntityState.Detached;
-                journal.IsDelete = true;
-                _context.GenJournal.Update(journal);
-                await _context.SaveChangesAsync();
-                return true;
+                //var journal =  _context.GenJournal.Where(j => j.JournalId == journalId).AsNoTracking().FirstOrDefault();
+                //_context.Entry(journal).State = EntityState.Detached;
+                //journal.IsDelete = true;
+                //_context.GenJournal.Update(journal);
+                //await _context.SaveChangesAsync();
+                //return true;
+
+                //string sql = $"UPDATE GenJournal SET 'IsDelete' = 1 WHERE 'JournalId' = {journalId}";
+
+                List<SqlParameter> parms = new List<SqlParameter>
+                {
+
+                };
+
+                var result = await _context.Database.ExecuteSqlAsync($"UPDATE GenJournal SET IsDelete = 1 WHERE JournalId = {journalId}");
+                return result > 0 ? true : false;
+                //return _context.Database.SqlQueryRaw<SelectJournalView>(sql, parms.ToArray()).ToList();
             }
             catch (Exception)
             {

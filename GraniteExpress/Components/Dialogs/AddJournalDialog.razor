@@ -349,7 +349,14 @@
                     var response = await _journalService.SaveJournal(Journal);
                     if (response is true)
                     {
-                        _snakBar.Add("Transaction Added Succesfully.", Severity.Success);
+                        if (EditJournalId != 0)
+                        {
+                            _snakBar.Add("Transaction Updated Succesfully.", Severity.Success);
+                        }
+                        else
+                        {
+                            _snakBar.Add("Transaction Added Succesfully.", Severity.Success);
+                        }
                         MudDialog.Close(DialogResult.Ok(response));
                     }
                     else

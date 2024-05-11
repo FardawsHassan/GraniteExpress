@@ -87,7 +87,7 @@ namespace GraniteExpress.Infrastructure
 
                 List<IdentityRoleClaim<string>> adminClaims = new();
 
-                foreach (var component in AppSettings.ComponentsDetails.Keys)
+                foreach (var component in AppSettings.Components.Keys)
                 {
                     adminClaims.Add(
                         new()

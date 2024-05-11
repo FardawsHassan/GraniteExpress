@@ -26,7 +26,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddAuthorization(options =>
 {
-    foreach (var component in AppSettings.ComponentsDetails.Keys)
+    foreach (var component in AppSettings.Components.Keys)
     {
         options.AddPolicy(component, policy => policy.RequireClaim(component+"Permission"));
     }

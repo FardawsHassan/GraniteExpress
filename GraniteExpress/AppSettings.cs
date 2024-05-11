@@ -4,17 +4,7 @@ namespace GraniteExpress.Models
 {
     public static class AppSettings
     {
-        public static List<string> Components = new()
-        {
-            "JournalViewAdd",
-            "JournalViewEdit",
-            "JournalViewDelete",
-            "JournalViewTable",
-            "JournalViewPrint",
-            "JournalViewExport",
-        };
-
-        public static Dictionary<string,string> ComponentsDetails = new()
+        public static Dictionary<string,string> Components = new()
         {
             ["JournalViewAdd"] = "Journal Add Permission",
             ["JournalViewEdit"] = "Journal Edit Permission",

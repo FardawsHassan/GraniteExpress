@@ -314,7 +314,7 @@
                     {
                         await OnInitializedAsync();
                         StateHasChanged();
-                        _snakBar.Add("Transaction Added Succesfully.", Severity.Success);
+                        // _snakBar.Add("Transaction Added Succesfully.", Severity.Success);
                     }
                     else
                     {
@@ -324,8 +324,12 @@
                 else
                 {
                     _snakBar.Add("Debit and Credit amount are not equal.", Severity.Error);
-                    Journal.JournalDetail.Add(new());
+                    Journal.JournalDetail.Add(lastJournal);
                 }
+            }
+            else
+            {
+                Journal.JournalDetail.Add(lastJournal);
             }
         }
     }

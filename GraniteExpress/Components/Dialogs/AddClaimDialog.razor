@@ -6,7 +6,7 @@
     <DialogContent>
         <MudItem xs="12" Class="d-flex flex-column gap-3 mx-4 pa-5">
             <MudSelect T="string" Label="Claims" MultiSelection="true" @bind-SelectedValues="SelectedClaims">
-                @foreach (var item in AppSettings.ComponentsDetails)
+                @foreach (var item in AppSettings.Components)
                 {
                     <MudSelectItem T="string" Value="@item.Key">@item.Value</MudSelectItem>
                 }
@@ -43,36 +43,5 @@
         {
             _snakBar.Add("Something went wrong", Severity.Error);
         }
-
-
-        // try
-        // {
-        //     if (string.IsNullOrEmpty(SelectedRole))
-        //     {
-        //         _snakBar.Add("Please insert a role", Severity.Error);
-        //     }
-        //     else if(Roles.Any(x => x.NormalizedName == SelectedRole.ToUpper()))
-        //     {
-        //         _snakBar.Add("Role already exists.", Severity.Error);
-
-        //     }
-        //     else
-        //     {
-        //         var response = await _userService.AddRole(SelectedRole);
-        //         if (response is true)
-        //         {
-        //             _snakBar.Add("Role added successfully", Severity.Success);
-        //             MudDialog.Close(DialogResult.Ok(response));
-        //         }
-        //         else
-        //         {
-        //             _snakBar.Add("Something went wrong", Severity.Error);
-        //         }
-        //     }
-        // }
-        // catch (Exception ex)
-        // {
-        //     _snakBar.Add(ex.Message, Severity.Error);
-        // }
     }
 }

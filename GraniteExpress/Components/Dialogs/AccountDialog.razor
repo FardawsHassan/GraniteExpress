@@ -2,27 +2,6 @@
 
 <MudDialog>
     <DialogContent>
-@*         <MudTable Items="Accounts" @ref=_mudTable Class="mb-5" Dense>
-            <HeaderContent>
-                <MudTh>Account Name</MudTh>
-                <MudTh>Account Code</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd>
-                    <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(@context))>
-                        <MudTextField Value="@context.AccountName" ReadOnly Margin="Margin.Dense"></MudTextField>
-                    </MudItem>
-                </MudTd>
-                <MudTd>
-                    <MudItem Style="min-height:40px;" @onclick=@(() => RowSelected(@context))>
-                        <MudTextField Value="@context.AccountCode" ReadOnly Margin="Margin.Dense"></MudTextField>
-                    </MudItem>
-                </MudTd>
-            </RowTemplate>
-        </MudTable> *@
-
-
-
         <MudDataGrid T="Account" Items="@Accounts" FilterMode=DataGridFilterMode.ColumnFilterRow  FilterCaseSensitivity=DataGridFilterCaseSensitivity.CaseInsensitive SortMode="SortMode.Multiple" Dense=true Filterable="true" Class="mb-5">
             <Columns>
                 <PropertyColumn Property="x => x.AccountCode" Title="Code">

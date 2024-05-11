@@ -176,15 +176,13 @@
         {
             try
             {
-                _snakBar.Add("Journal addtion succesful.", Severity.Success);
                 JournalViews = await _journalService.GetJournalViews();
                 StateHasChanged();
             }
             catch (Exception)
             {
-                _snakBar.Add("Journal addtion failed.", Severity.Error);
+                _snakBar.Add("Journal update failed.", Severity.Error);
             }
-
         }
     }
 
@@ -198,7 +196,7 @@
             var isDeleted = await _journalService.DeleteJournal(journalView.JournalId ?? 0);
             if (isDeleted)
             {
-                JournalViews = await _journalService.GetJournalViews();
+                JournalViews.RemoveAll(x => x.JournalId == journalView.JournalId);
                 _snakBar.Add("Journal is deleted successfully.", Severity.Success);
                 StateHasChanged();
             }
