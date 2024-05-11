@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GraniteExpress.Models
 {
@@ -23,10 +24,15 @@ namespace GraniteExpress.Models
         public bool IsDelete { get; set; } = false;
 
 
+        [NotMapped]
         public List<JournalDetail> JournalDetail { get; set; }
+        [NotMapped]
         public DocumentType DocumentType { get; set; }
+        [NotMapped]
         public Template Template { get; set; }
+        [NotMapped]
         public Client Client { get; set; }
+        [NotMapped]
         public User User { get; set; }
     }
 }
