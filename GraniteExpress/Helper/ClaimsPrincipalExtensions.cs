@@ -19,12 +19,6 @@ namespace GraniteExpress.Helper
             {
                 var claim = principal.FindFirst(claimType);
                 return (T)Convert.ChangeType(claim.Value, typeof(T));
-
-                //if (claim is not null)
-                //{
-                //    return (T)Convert.ChangeType(claim.Value, typeof(T));
-                //}
-                //return default(T);
             }
             catch
             {

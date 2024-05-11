@@ -1,9 +1,7 @@
-﻿using GraniteExpress.Components.Pages;
-using GraniteExpress.Data;
+﻿using GraniteExpress.Data;
 using GraniteExpress.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace GraniteExpress.Services
 {
@@ -42,18 +40,8 @@ namespace GraniteExpress.Services
         {
             try
             {
-                //var journal =  _context.GenJournal.Where(j => j.JournalId == journalId).AsNoTracking().FirstOrDefault();
-                //_context.Entry(journal).State = EntityState.Detached;
-                //journal.IsDelete = true;
-                //_context.GenJournal.Update(journal);
-                //await _context.SaveChangesAsync();
-                //return true;
-
-                //string sql = $"UPDATE GenJournal SET 'IsDelete' = 1 WHERE 'JournalId' = {journalId}";
-
                 var result = await _context.Database.ExecuteSqlAsync($"UPDATE GenJournal SET IsDelete = 1 WHERE JournalId = {journalId}");
                 return result > 0 ? true : false;
-                //return _context.Database.SqlQueryRaw<SelectJournalView>(sql, parms.ToArray()).ToList();
             }
             catch (Exception)
             {
@@ -117,21 +105,16 @@ namespace GraniteExpress.Services
                 var result = _context.GenJournal.Where(x => x.JournalId == journal.JournalId).FirstOrDefault();
                 if (result is null)
                 {
-                    //var newJournal = new Journal
-                    //{
-                    //    JournalDescription = journal.JournalDescription,
-                    //    DocumentTypeId = journal.DocumentTypeId,
-                    //    ClientId = journal.ClientId,
-                    //    DocumentNo = journal.DocumentNo,
-                    //    DocumentDate = journal.DocumentDate,
-                    //    UserId = journal.UserId,
-                    //    TemplateId = journal.TemplateId
-                    //};
-                    //var response = await _context.GenJournal.AddAsync(newJournal);
-                    //await _context.SaveChangesAsync();
-
                     List<Journal> list;
-                    string sql = "EXEC AddJournal @TemplateId, @DocumentDate,@JournalDescription,@DocumentTypeId,@ClientId,@DocumentNo,@UserId,0";
+                    string sql = string.Empty;
+                    if (journal.TemplateId is null)
+                    {
+                        sql = "EXEC AddJournal NULL, @DocumentDate,@JournalDescription,@DocumentTypeId,@ClientId,@DocumentNo,@UserId";
+                    }
+                    else
+                    {
+                        sql = "EXEC AddJournal @TemplateId, @DocumentDate,@JournalDescription,@DocumentTypeId,@ClientId,@DocumentNo,@UserId";
+                    }
 
                     List<SqlParameter> journalParams = new List<SqlParameter>
                     {
@@ -143,38 +126,25 @@ namespace GraniteExpress.Services
                         new SqlParameter { ParameterName = "@DocumentNo", Value = journal.DocumentNo },
                         new SqlParameter { ParameterName = "@DocumentDate", Value = journal.DocumentDate },
                         new SqlParameter { ParameterName = "@UserId", Value = journal.UserId },
-                        new SqlParameter { ParameterName = "@TemplateId", Value = journal.TemplateId },
                     };
+                    if(journal.TemplateId is not null)
+                    {
+                        journalParams.Add(new SqlParameter { ParameterName = "@TemplateId", Value = journal.TemplateId });
+                    }
 
                     var responese = _context.Database.SqlQueryRaw<Journal>(sql, journalParams.ToArray()).ToList();
 
 
-                    //journal.JournalId = response.Entity.JournalId;
                     var journalDetails = journal.JournalDetail;
                     foreach(var item in journalDetails)
                     {
                         item.JournalId = responese.FirstOrDefault().JournalId;
                         var queryResult = await _context.Database.ExecuteSqlAsync($"INSERT INTO GenJournalDetails (JournalId,AccountId,IsDebit,ClientId,CurrencyAmount,ExchangeRate,CashFlowId) VALUES ({item.JournalId} ,{item.AccountId},{item.IsDebit},{item.ClientId},{item.CurrencyAmount},{item.ExchangeRate},{item.CashFlowId})");
                     }
-
-                    //journalDetails.ForEach(x => x.JournalId = journal.JournalId);
-                    //await _context.GenJournalDetails.AddRangeAsync(journalDetails);
-                    //await _context.SaveChangesAsync();
                     return true;
                 }
                 else
                 {
-
-                    //result.JournalDescription = journal.JournalDescription;
-                    //result.DocumentTypeId = journal.DocumentTypeId;
-                    //result.ClientId = journal.ClientId;
-                    //result.DocumentNo = journal.DocumentNo;
-                    //result.DocumentDate = journal.DocumentDate;
-                    //result.UserId = journal.UserId;
-                    //result.TemplateId = journal.TemplateId;
-                    //_context.Entry(journal).State = EntityState.Detached;
-                    //var response = _context.GenJournal.Update(result);
-
                     var queryResult = await _context.Database.ExecuteSqlAsync($"UPDATE GenJournal SET IsDelete = {journal.IsDelete}, JournalDescription = {journal.JournalDescription}, DocumentTypeId = {journal.DocumentTypeId}, ClientId = {journal.ClientId}, DocumentNo = {journal.DocumentNo}, TemplateId = {journal.TemplateId} WHERE JournalId = {journal.JournalId}");
                     if(queryResult == 0)
                     {
@@ -187,20 +157,11 @@ namespace GraniteExpress.Services
                         var updateJournal = journal.JournalDetail.Where(x => x.JournalDetailId == item.JournalDetailId).FirstOrDefault();
                         if (updateJournal is not null)
                         {
-                            //item.AccountId = updateJournal.AccountId;
-                            //item.CashFlowId = updateJournal.CashFlowId;
-                            //item.ClientId = updateJournal.ClientId;
-                            //item.ExchangeRate = updateJournal.ExchangeRate;
-                            //item.CurrencyAmount = updateJournal.CurrencyAmount;
-                            //item.IsDebit = updateJournal.IsDebit;
-                            //_context.GenJournalDetails.Update(item);
                             queryResult = await _context.Database.ExecuteSqlAsync($"UPDATE GenJournalDetails SET AccountId = {updateJournal.AccountId}, CashFlowId = {updateJournal.CashFlowId}, ClientId = {updateJournal.ClientId}, IsDebit = {updateJournal.IsDebit}, ExchangeRate = {updateJournal.ExchangeRate}, CurrencyAmount = {updateJournal.CurrencyAmount} WHERE JournalDetailId = {updateJournal.JournalDetailId}");
                         }
                         else
                         {
                             queryResult = await _context.Database.ExecuteSqlAsync($"DELETE FROM GenJournalDetails WHERE JournalDetailId = {item.JournalDetailId}");
-
-                            //_context.GenJournalDetails.Remove(item);
                         }
                     }
 
@@ -210,16 +171,9 @@ namespace GraniteExpress.Services
                         if(!journalDetails.Any(x => x.JournalDetailId == item.JournalDetailId))
                         {
                             item.JournalId = journal.JournalId;
-                            //newJournals.Add(item);
                             queryResult = await _context.Database.ExecuteSqlAsync($"INSERT INTO GenJournalDetails (JournalId,AccountId,IsDebit,ClientId,CurrencyAmount,ExchangeRate,CashFlowId) VALUES ({item.JournalId} ,{item.AccountId},{item.IsDebit},{item.ClientId},{item.CurrencyAmount},{item.ExchangeRate},{item.CashFlowId})");
                         }
                     }
-
-                    //var newJournals = journal.JournalDetail.Where(x => journalDetails.Any(y => x.JournalDetailId != y.JournalDetailId)).ToList();
-                    //newJournals.ForEach(x => x.JournalId = journal.JournalId);
-                    //await _context.GenJournalDetails.AddRangeAsync(newJournals);
-
-                    //await _context.SaveChangesAsync();
                     return true;
                 }
             }

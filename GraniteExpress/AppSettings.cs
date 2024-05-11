@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace GraniteExpress.Models
+﻿namespace GraniteExpress.Models
 {
     public static class AppSettings
     {

@@ -1,10 +1,6 @@
-﻿using GraniteExpress.Components.Pages;
-using GraniteExpress.DtoModels;
+﻿using GraniteExpress.DtoModels;
 using GraniteExpress.Models;
-using GraniteExpress.Response;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Data;
 using System.Security.Claims;
 
@@ -41,15 +37,6 @@ namespace GraniteExpress.Services
         {
             try
             {
-                //if (string.Equals(registerRequest.Email, "admin@gmail.com", StringComparison.OrdinalIgnoreCase))
-                //{
-                //    return new()
-                //    {
-                //        IsSuccess = false,
-                //        Message = "User Already exists!"
-                //    };
-                //}
-
                 var hasUser = await _userManager.FindByEmailAsync(registerRequest.Email);
 
                 if (hasUser is not null)
@@ -122,13 +109,7 @@ namespace GraniteExpress.Services
         {
             var user = await _userManager.FindByIdAsync(_user.Id);
             var result = await _userManager.DeleteAsync(user);
-            //var role = await _userManager.GetRolesAsync(user);
-            //if (role.Any())
-            //{
-            //    await _userManager.RemoveFromRoleAsync(user, role.FirstOrDefault());
-            //}
-            
-            //var result = await _userManager.AddToRoleAsync(user, _user.UserRole);
+
             if (result.Succeeded)
             {
                 return true;
@@ -150,7 +131,6 @@ namespace GraniteExpress.Services
 
                 var hasRoles = await _userManager.GetRolesAsync(hasUser);
                 Dictionary<string, string> claims = new Dictionary<string, string>();
-                //List<string> claims = new();
                 foreach (var role in hasRoles)
                 {
                     var identityRole = await _roleManager.FindByNameAsync(role);

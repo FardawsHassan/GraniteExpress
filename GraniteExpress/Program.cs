@@ -1,29 +1,15 @@
-using GraniteExpress;
 using GraniteExpress.Components;
 using GraniteExpress.Data;
 using GraniteExpress.Infrastructure;
 using GraniteExpress.Models;
-using GraniteExpress.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MudBlazor.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-//builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//    options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-//builder.Services.AddCascadingAuthenticationState();
-//builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-//    .AddEntityFrameworkStores<ApplicationDbContext>()
-//    .AddSignInManager()
-//    .AddDefaultTokenProviders();
-
-
 builder.Services.AddAuthorization(options =>
 {
     foreach (var component in AppSettings.Components.Keys)
@@ -31,8 +17,6 @@ builder.Services.AddAuthorization(options =>
         options.AddPolicy(component, policy => policy.RequireClaim(component+"Permission"));
     }
 });
-
-
 
 builder.Services.AddAuthenticationCore()
                 .AddDbContext<ApplicationDbContext>(options =>
@@ -43,13 +27,8 @@ builder.Services.AddAuthenticationCore()
                     options.Password.RequireDigit = false;
                     options.Password.RequireLowercase = false;
                     options.Password.RequireUppercase = false;
-                    //options.Password.RequiredLength = 6;
                     options.Password.RequireNonAlphanumeric = false;
                     options.User.RequireUniqueEmail = true;
-                    //options.Lockout.AllowedForNewUsers = true;
-                    //options.Lockout.MaxFailedAccessAttempts = 3;
-                    //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
-                    //options.Tokens.PasswordResetTokenProvider = "resetPassword";
                 }).AddDefaultTokenProviders()
                   .AddEntityFrameworkStores<ApplicationDbContext>();
 
@@ -66,7 +45,6 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

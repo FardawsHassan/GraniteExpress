@@ -1,52 +1,54 @@
 ﻿@inject ITemplateService _templateService
 <MudDialog>
     <DialogContent>
-        <MudTable Items="Templates" @ref=mudtable @bind-SelectedItem="SelectedTemplate" Class="mb-5" Dense Bordered Striped Elevation="5">
-            <RowTemplate>
-                <MudTd>
-                    <MudItem Style="min-height:40px;" @ondblclick=@(() => RowSelected(@context)) @onclick=@(() => TemplateDetailsChanged(@context))>
-                        <MudTextField Value="@context.TemplateName" ReadOnly Margin="Margin.Dense"></MudTextField>
-                    </MudItem>
-                </MudTd>
-            </RowTemplate>
-        </MudTable>
-
-        @if(SelectedTemplate.TemplateId != 0)
-        {
-            <MudTable Class="mt-4 mb-5" Bordered Items="SelectedTemplate.TemplateDetail" HeaderClass="detailsHeader" Dense>
-                <HeaderContent>
-                    <MudTh>Account Name</MudTh>
-                    <MudTh>Account Code</MudTh>
-                    <MudTh>Currency Code</MudTh>
-                    <MudTh>Is Debit</MudTh>
-                </HeaderContent>
+        <MudItem xs="12" Style="min-height: 400px;">
+            <MudTable Items="Templates" @ref=mudtable @bind-SelectedItem="SelectedTemplate" Class="mb-5" Dense Bordered Striped Elevation="5">
                 <RowTemplate>
                     <MudTd>
-                        <MudItem Style="min-height:40px;">
-                            <MudTextField Value="@context.Account.AccountName" ReadOnly Margin="Margin.Dense"></MudTextField>
-                        </MudItem>
-                    </MudTd>
-                    <MudTd>
-                        <MudItem Style="min-height:40px;">
-                            <MudTextField Value="@context.Account.AccountCode" ReadOnly Margin="Margin.Dense"></MudTextField>
-                        </MudItem>
-                    </MudTd>
-                    <MudTd>
-                        <MudItem Style="min-height:40px;">
-                            <MudTextField Value="@context.Account.Currency.CurrencyCode" ReadOnly Margin="Margin.Dense"></MudTextField>
-                        </MudItem>
-                    </MudTd>
-                    <MudTd>
-                        <MudItem Style="min-height:40px;">
-                            <MudTextField Value="@context.IsDebit.ToString()" ReadOnly Margin="Margin.Dense"></MudTextField>
+                        <MudItem Style="min-height:40px;" @ondblclick=@(() => RowSelected(@context)) @onclick=@(() => TemplateDetailsChanged(@context))>
+                            <MudTextField Value="@context.TemplateName" ReadOnly Margin="Margin.Dense"></MudTextField>
                         </MudItem>
                     </MudTd>
                 </RowTemplate>
-                <NoRecordsContent>
-                    <MudText>No Data Available</MudText>
-                </NoRecordsContent>
             </MudTable>
-        }
+
+            @if(SelectedTemplate.TemplateId != 0)
+            {
+                <MudTable Class="mt-4 mb-5" Bordered Items="SelectedTemplate.TemplateDetail" HeaderClass="detailsHeader" Dense>
+                    <HeaderContent>
+                        <MudTh>Account Name</MudTh>
+                        <MudTh>Account Code</MudTh>
+                        <MudTh>Currency Code</MudTh>
+                        <MudTh>Is Debit</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>
+                            <MudItem Style="min-height:40px;">
+                                <MudTextField Value="@context.Account.AccountName" ReadOnly Margin="Margin.Dense"></MudTextField>
+                            </MudItem>
+                        </MudTd>
+                        <MudTd>
+                            <MudItem Style="min-height:40px;">
+                                <MudTextField Value="@context.Account.AccountCode" ReadOnly Margin="Margin.Dense"></MudTextField>
+                            </MudItem>
+                        </MudTd>
+                        <MudTd>
+                            <MudItem Style="min-height:40px;">
+                                <MudTextField Value="@context.Account.Currency.CurrencyCode" ReadOnly Margin="Margin.Dense"></MudTextField>
+                            </MudItem>
+                        </MudTd>
+                        <MudTd>
+                            <MudItem Style="min-height:40px;">
+                                <MudTextField Value="@context.IsDebit.ToString()" ReadOnly Margin="Margin.Dense"></MudTextField>
+                            </MudItem>
+                        </MudTd>
+                    </RowTemplate>
+                    <NoRecordsContent>
+                        <MudText>No Data Available</MudText>
+                    </NoRecordsContent>
+                </MudTable>
+            }
+        </MudItem>
     </DialogContent>
 </MudDialog>
 
