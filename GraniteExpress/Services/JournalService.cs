@@ -1,9 +1,11 @@
 ﻿using GraniteExpress.Components.Pages;
 using GraniteExpress.Data;
 using GraniteExpress.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using static MudBlazor.CategoryTypes;
 
 namespace GraniteExpress.Services
 {
@@ -119,7 +121,10 @@ namespace GraniteExpress.Services
         {
             try
             {
-                var result = _context.GenJournal.Where(x => x.JournalId == journal.JournalId).FirstOrDefault();
+                var result = _context.GenJournal
+                    .Where(x => x.JournalId == journal.JournalId)
+                    .FirstOrDefault();
+
                 if (result is null)
                 {
                     var newJournal = new Journal
@@ -143,7 +148,6 @@ namespace GraniteExpress.Services
                 }
                 else
                 {
-
                     result.JournalDescription = journal.JournalDescription;
                     result.DocumentTypeId = journal.DocumentTypeId;
                     result.ClientId = journal.ClientId;
@@ -151,44 +155,36 @@ namespace GraniteExpress.Services
                     result.DocumentDate = journal.DocumentDate;
                     result.UserId = journal.UserId;
                     result.TemplateId = journal.TemplateId;
-                    //_context.Entry(journal).State = EntityState.Detached;
-                    var response = _context.GenJournal.Update(result);
 
-                    var journalDetails = _context.GenJournalDetails.Where(x => x.JournalId == journal.JournalId);
-                    foreach(var item in journalDetails)
+                    var journalDetails = await _context.GenJournalDetails.Where(x=>x.JournalId== journal.JournalId).ToListAsync();
+
+                    List<JournalDetail> newJournalDetails = new();
+                    foreach (var detail in journal.JournalDetail)
                     {
-                        var updateJournal = journal.JournalDetail.Where(x => x.JournalDetailId == item.JournalDetailId).FirstOrDefault();
-                        if (updateJournal is not null)
+                        var hasJournal = journalDetails.Where(x => x.JournalDetailId == detail.JournalDetailId).FirstOrDefault();
+                        if(hasJournal != null)
                         {
-                            item.AccountId = updateJournal.AccountId;
-                            item.CashFlowId = updateJournal.CashFlowId;
-                            item.ClientId = updateJournal.ClientId;
-                            item.ExchangeRate = updateJournal.ExchangeRate;
-                            item.CurrencyAmount = updateJournal.CurrencyAmount;
-                            item.IsDebit = updateJournal.IsDebit;
-                            _context.GenJournalDetails.Update(item);
+                            hasJournal.AccountId = detail.AccountId;
+                            hasJournal.CashFlowId = detail.CashFlowId;
+                            hasJournal.ClientId = detail.ClientId;
+                            hasJournal.ExchangeRate = detail.ExchangeRate;
+                            hasJournal.CurrencyAmount = detail.CurrencyAmount;
+                            hasJournal.IsDebit = detail.IsDebit;
+                            newJournalDetails.Add(hasJournal);
                         }
                         else
                         {
-                            _context.GenJournalDetails.Remove(item);
+                            detail.JournalId = journal.JournalId;
+                            newJournalDetails.Add(detail);
                         }
                     }
 
-                    List<JournalDetail> newJournals = new();
-                    foreach(var item in journal.JournalDetail)
-                    {
-                        if(!journalDetails.Any(x => x.JournalDetailId == item.JournalDetailId))
-                        {
-                            item.JournalId = journal.JournalId;
-                            newJournals.Add(item);
-                        }
-                    }
+                    result.JournalDetail = newJournalDetails;
 
-                    //var newJournals = journal.JournalDetail.Where(x => journalDetails.Any(y => x.JournalDetailId != y.JournalDetailId)).ToList();
-                    //newJournals.ForEach(x => x.JournalId = journal.JournalId);
-                    await _context.GenJournalDetails.AddRangeAsync(newJournals);
+                    _context.GenJournal.Update(result);
 
                     await _context.SaveChangesAsync();
+
                     return true;
                 }
             }

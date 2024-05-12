@@ -33,7 +33,7 @@ namespace GraniteExpress.Data
                 .HasOne(p => p.Journal)
                 .WithMany(pn => pn.JournalDetail)
                 .HasForeignKey(f => f.JournalId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<JournalDetail>()
                 .HasOne(p => p.CashFlow)
