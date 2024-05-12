@@ -1,16 +1,16 @@
 ﻿@page "/view"
 @using GraniteExpress.Components.Dialogs
 @inject IJournalService _journalService
+@attribute [Authorize]
 
 <PageTitle>Journal View</PageTitle>
 
 <MudGrid>
+
     <AuthorizeView Policy="JournalViewTable" Context="table">
-        <MudDataGrid T="Models.JournalView" Items="JournalViews" ColumnResizeMode="ResizeMode.Container" SortMode="SortMode.Multiple" Dense=true Filterable="true"
+        <MudText Typo="Typo.h4" Class="mt-3 mb-6">Journal Views</MudText>
+        <MudDataGrid Dense T="Models.JournalView" Items="JournalViews" FooterClass="pa-2" FixedFooter=true Height="67.5vh" Bordered=true ColumnResizeMode="ResizeMode.Container" SortMode="SortMode.Multiple" Filterable="true"
                      Hideable="true">
-            <ToolBarContent>
-                <MudText Typo="Typo.h6">Journal Views</MudText>
-            </ToolBarContent>
             <Columns>
                 <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.DocumentName" Title="Document Name">
                     <CellTemplate>
@@ -65,8 +65,17 @@
                             @(" ")
                         }
                     </CellTemplate>
+                    <FooterTemplate>
+                        @{
+                            var sum = JournalViews.Where(x => x.IsDebit == true).Sum(s => s.CurrencyAmount * s.ExchangeRate);
+                            if (sum is not null)
+                            {
+                                <MudText>Total Debit: @sum.Value.ToString("0.00")</MudText>
+                            }
+                        }
+                    </FooterTemplate>
                 </TemplateColumn>
-                <TemplateColumn CellStyleFunc="@_cellStyleFunc" Title="Credit Amount">
+                <TemplateColumn CellStyleFunc="@_cellStyleFunc" Title="Credit Amount" >
                     <CellTemplate>
                         @if ((context.Item.IsDebit is not null))
                         {
@@ -80,6 +89,15 @@
                             @(" ")
                         }
                     </CellTemplate>
+                    <FooterTemplate>
+                        @{
+                            var sum = JournalViews.Where(x => x.IsDebit == false).Sum(s => s.CurrencyAmount * s.ExchangeRate);
+                            if(sum is not null)
+                            {
+                                <MudText>Total Credit: @sum.Value.ToString("0.00")</MudText>
+                            }
+                        }
+                    </FooterTemplate>
                 </TemplateColumn>
                 <PropertyColumn CellStyleFunc="@_cellStyleFunc" Property="x => x.IsDebit" Title="Is Debit">
                     <CellTemplate>
@@ -91,17 +109,17 @@
                     <CellTemplate>
                         <MudItem Class="d-flex gap-2">
                             <AuthorizeView Policy="JournalViewEdit" Context="edit">
-                                <MudButton Variant="Variant.Outlined" Color="Color.Info" OnClick="@(async () => await EditJournal(context.Item))">Edit</MudButton>
+                                <MudButton Variant="Variant.Filled" DisableElevation Color="Color.Info" OnClick="@(async () => await EditJournal(context.Item))">Edit</MudButton>
                             </AuthorizeView>
                             <AuthorizeView Policy="JournalViewDelete" Context="delete">
-                                <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@(async () => await DeleteJournal(context.Item))">Delete</MudButton>
+                                <MudButton Variant="Variant.Filled" DisableElevation Color="Color.Error" OnClick="@(async () => await DeleteJournal(context.Item))">Delete</MudButton>
                             </AuthorizeView>
                         </MudItem>
                     </CellTemplate>
                 </TemplateColumn>
             </Columns>
             <PagerContent>
-                <MudDataGridPager T="Models.JournalView" />
+                <MudDataGridPager PageSizeOptions=[25,50,100] T="Models.JournalView" />
             </PagerContent>
         </MudDataGrid>
     </AuthorizeView>
@@ -141,6 +159,12 @@
 
         return gray ? "background:#32333d" : "background:#676767";
     };
+
+    AggregateDefinition<JournalView> _ageAggregation = new AggregateDefinition<JournalView>
+        {
+            Type = AggregateType.Sum,
+            DisplayFormat = "Total Debit: {value}"
+        };
 
 
     private async Task OpenAddJournalDialog()

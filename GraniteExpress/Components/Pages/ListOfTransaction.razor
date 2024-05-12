@@ -1,5 +1,6 @@
 ﻿@page "/listoftransaction"
 @inject IJournalService _journalService
+@attribute [Authorize]
 
 
 <MudItem xs=6 Class="d-flex gap-4 mb-6 mt-4">
@@ -7,7 +8,7 @@
     <MudButton OnClick="GetSeletJournals" Class="px-6" Variant="Variant.Filled" Color="Color.Primary">GetJournals</MudButton>
 </MudItem>
 
-<MudDataGrid T="SelectJournalView" Items="@JournalViews" FilterMode=DataGridFilterMode.ColumnFilterRow FilterCaseSensitivity=DataGridFilterCaseSensitivity.CaseInsensitive SortMode="SortMode.Multiple" Dense=true Filterable="true" Class="mb-5">
+<MudDataGrid T="SelectJournalView" Items="@JournalViews" Bordered=true FilterMode=DataGridFilterMode.ColumnFilterRow FilterCaseSensitivity=DataGridFilterCaseSensitivity.CaseInsensitive SortMode="SortMode.Multiple" Dense=true Filterable="true" Class="mb-5">
     <Columns>
         <PropertyColumn Property="x => x.DocumentNo" Title="Document No">
             <CellTemplate>
@@ -24,12 +25,26 @@
         </PropertyColumn>
         <PropertyColumn Property="x => x.ExchangeRate" Title="Exchange Rate">
             <CellTemplate>
-                @context.Item.ExchangeRate
+                @if (context.Item.ExchangeRate is not null)
+                {
+                    @context.Item.ExchangeRate.Value.ToString("0.00")
+                }
+                else
+                {
+                    @("0")
+                }
             </CellTemplate>
         </PropertyColumn>
         <PropertyColumn Property="x => x.CurrencyAmount" Title="Currency Amount">
             <CellTemplate>
-                @context.Item.CurrencyAmount
+                @if (context.Item.CurrencyAmount is not null)
+                {
+                    @context.Item.CurrencyAmount.Value.ToString("0.00")
+                }
+                else
+                {
+                    @("0")
+                }
             </CellTemplate>
         </PropertyColumn>
         <PropertyColumn Property="x => x.AccountId" Title="Account Id">
@@ -39,7 +54,7 @@
         </PropertyColumn>
     </Columns>
     <PagerContent>
-        <MudDataGridPager T="SelectJournalView" />
+        <MudDataGridPager PageSizeOptions=[25,50,100] T="SelectJournalView" />
     </PagerContent>
 </MudDataGrid>
 

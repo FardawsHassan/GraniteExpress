@@ -1,17 +1,18 @@
 ﻿@page "/login"
+@using GraniteExpress.Components.Layout
 @using Microsoft.AspNetCore.Authorization
 @attribute [AllowAnonymous]
 @inject IAuthenticationService _authService
 @inject IUserService _userService
 @inject NavigationManager _navigationManager
 
-<MudGrid>
-    <MudItem xs="12" sm="6" md="4" lg="3" xl=2 Class="d-flex flex-column gap-3 mx-4">
-        <MudText Style="font-size: 38px;" Typo="Typo.h3" Class="mb-2">Log In</MudText>
+<MudGrid Justify="Justify.Center">
+    <MudPaper Class="d-flex flex-column gap-3 mx-4 mt-14" Square=false Style="min-height: 60vh;align-content: center;justify-content: center;padding: 100px 85px;">
+        <MudText Style="font-size: 38px;font-weight: 500;text-align: center;" Typo="Typo.h3" Class="mb-7">Log In</MudText>
         <EditForm Model="@_login" OnValidSubmit="Submit" Enhance>
             <DataAnnotationsValidator />
             <MudItem>
-                <MudTextField Class="pb-4" @bind-Value="_login.Email" Immediate="true" Label="Email" Variant="Variant.Outlined" Margin="Margin.Dense" For="() => _login.Email" />
+                <MudTextField Class="pb-5" @bind-Value="_login.Email" Immediate="true" Label="Email" Variant="Variant.Outlined" Margin="Margin.Dense" For="() => _login.Email" />
                 <MudTextField Class="pb-4" @bind-Value="_login.Password" Immediate="true" Label="Password" Margin="Margin.Dense" Variant="Variant.Outlined" InputType="@Password" Adornment="Adornment.End" AdornmentIcon="@PasswordIcon" OnAdornmentClick="ShowPassword" AdornmentAriaLabel="Show Password" For="() => _login.Password" />
                 @if (_errorMessage.Any())
                 {
@@ -20,11 +21,15 @@
                         <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="my-2">@message</MudAlert>
                     }
                 }
-                <MudButton Color="Color.Primary" Class="py-2 mt-1" Variant="Variant.Filled" ButtonType="ButtonType.Submit"><MudText Typo="Typo.body2">Login</MudText></MudButton>
+                <MudItem xs="12">
+                    <MudLink Class="my-2" Underline="Underline.None" Href="/forgot/password">Forgot Password!</MudLink>
+                </MudItem>
+                <MudItem Class="d-flex justify-content-center">
+                    <MudButton Style="text-align: center;padding: 37px;margin-top: 18px !important;" Color="Color.Primary" Class="py-2 mt-1" Variant="Variant.Filled" ButtonType="ButtonType.Submit"><MudText Typo="Typo.body2">Login</MudText></MudButton>
+                </MudItem>
             </MudItem>
         </EditForm>
-        @* <MudLink Underline="Underline.None" Href="/register">Register here!</MudLink> *@
-    </MudItem>
+    </MudPaper>
 </MudGrid>
 
 @code {
@@ -79,7 +84,7 @@
             {
                 await ((AuthStateProvider)_authStateProvider).SetStateAsync(response.UserId);
                 _errorMessage.Clear();
-                _navigationManager.NavigateTo("/transaction");
+                _navigationManager.NavigateTo("/");
             }
             else
             {

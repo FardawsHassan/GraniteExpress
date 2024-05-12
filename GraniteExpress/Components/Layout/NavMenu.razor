@@ -5,26 +5,37 @@
 
 <MudText Class="py-5 pl-5 mb-1">GraniteExpress</MudText>
 <MudNavMenu Bordered Rounded Color="Color.Primary">
-    <MudNavGroup Icon="@Icons.Material.Filled.Storage" Title="Reference" Expanded="true">
-        <MudNavLink Href="/account" Match="NavLinkMatch.Prefix">Chart of Accounts</MudNavLink>
-        <MudNavLink Href="/client" Match="NavLinkMatch.Prefix">Clients</MudNavLink>
-        <MudNavLink Href="/template" Match="NavLinkMatch.Prefix">Templates</MudNavLink>
-    </MudNavGroup>
+    <AuthorizeView Policy="ReferenceMenuPermission">
+        <MudNavGroup Icon="@Icons.Material.Filled.Storage" Title="Reference" Expanded="true">
+            <MudNavLink Href="/account" Match="NavLinkMatch.Prefix">Chart of Accounts</MudNavLink>
+            <MudNavLink Href="/client" Match="NavLinkMatch.Prefix">Clients</MudNavLink>
+            <MudNavLink Href="/template" Match="NavLinkMatch.Prefix">Templates</MudNavLink>
+        </MudNavGroup>
+    </AuthorizeView>
     <AuthorizeView>
         <MudNavGroup Title="Journal" Icon="@Icons.Material.Filled.CurrencyExchange" Expanded="true">
             <MudNavLink Href="/transaction" Match="NavLinkMatch.Prefix">Transaction</MudNavLink>
             <MudNavLink Href="/view" Match="NavLinkMatch.Prefix">View</MudNavLink>
         </MudNavGroup>
-        <MudNavGroup Icon="@Icons.Material.Filled.Dashboard" Title="Report" Expanded="true">
-            <MudNavLink Href="/listoftransaction" Match="NavLinkMatch.Prefix">List of Transaction</MudNavLink>
-        </MudNavGroup>
+        <AuthorizeView Policy="ReportMenuPermission" Context="ReportMenuPermission">
+            <MudNavGroup Icon="@Icons.Material.Filled.Dashboard" Title="Report" Expanded="true">
+                <MudNavLink Href="/listoftransaction" Match="NavLinkMatch.Prefix">List of Transaction</MudNavLink>
+            </MudNavGroup>
+        </AuthorizeView>
     </AuthorizeView>
-    <AuthorizeView Roles="Admin">
+    <AuthorizeView Policy="AdminMenuPermission">
         <MudNavGroup Title="Admin" Icon="@Icons.Material.Filled.AdminPanelSettings" Expanded="true">
             <MudNavLink Href="/users" Match="NavLinkMatch.Prefix">User</MudNavLink>
             <MudNavLink Href="/roles" Match="NavLinkMatch.Prefix">Role</MudNavLink>
-            <MudNavLink Href="/claims" Match="NavLinkMatch.Prefix">Claims</MudNavLink>
+            <MudNavLink Href="/claims" Match="NavLinkMatch.Prefix">Claims</MudNavLink>            
         </MudNavGroup>
+    </AuthorizeView>
+    <AuthorizeView Roles="Admin">
+        <NotAuthorized>
+            <MudNavGroup Title="Settings" Icon="@Icons.Material.Filled.AdminPanelSettings" Expanded="true">
+                <MudNavLink Href="/changePassword" Match="NavLinkMatch.Prefix">Change Password</MudNavLink>
+            </MudNavGroup>
+        </NotAuthorized>
     </AuthorizeView>
 </MudNavMenu>
 

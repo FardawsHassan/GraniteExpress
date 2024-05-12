@@ -1,4 +1,5 @@
-﻿using Blazored.LocalStorage;
+﻿using Alumni.Services.Services;
+using Blazored.LocalStorage;
 using GraniteExpress.Data;
 using GraniteExpress.Models;
 using GraniteExpress.Services;
@@ -27,6 +28,8 @@ namespace GraniteExpress.Infrastructure
                     .AddScoped<IDocumentService, DocumentService>()
                     .AddScoped<ITemplateService, TemplateService>()
                     .AddScoped<ICashFlowService, CashFlowService>()
+                    .AddScoped<IEmailService, EmailService>()
+                    .AddScoped<IDataProtectionService, DataProtectionService>()
                     .AddScoped<IAuthenticationService, AuthenticationService>()
                     .AddScoped<IUserService, UserService>()
                     .AddScoped<CurrentUserState>()
@@ -95,7 +98,7 @@ namespace GraniteExpress.Infrastructure
                             RoleId = adminRoleId,
                             ClaimType = component + "Permission",
                             ClaimValue = component
-                        }    
+                        }
                     );
                 }
                 dbContext.RoleClaims.AddRange(adminClaims);

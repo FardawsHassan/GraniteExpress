@@ -1,23 +1,39 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager _navigationManager
+
 <MudThemeProvider IsDarkMode=true Theme="_theme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
+
 <MudLayout>
-    <MudAppBar>
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-            <MudSpacer />
-        <MudIconButton Style="color:white" Icon="@Icons.Material.Filled.Logout" OnClick="Logout" />
-    </MudAppBar>
-    <MudDrawer @bind-Open="@_drawerOpen">
-        <NavMenu/>
-    </MudDrawer>
-    <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="px-10 py-7">
-            @Body
-        </MudContainer>
-    </MudMainContent>
+    <AuthorizeView>
+        <Authorized>
+            <MudAppBar>
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+                    <MudSpacer />
+                <MudButton Variant=Variant.Text Style="color:white;text-transform: capitalize;" OnClick="Logout" >Log Out</MudButton>
+            </MudAppBar>
+            <MudDrawer @bind-Open="@_drawerOpen">
+                <NavMenu/>
+            </MudDrawer>
+            <MudMainContent>
+                <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="px-10 py-7">
+                    @Body
+                </MudContainer>
+            </MudMainContent>
+        </Authorized>
+        <NotAuthorized>
+            <MudAppBar>
+                <MudText Style="font-weight: 500; padding-left: 35px;color: white;font-size:20px;">Granite Express</MudText>
+            </MudAppBar>
+            <MudMainContent>
+                <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="px-10 py-7">
+                    @Body
+                </MudContainer>
+            </MudMainContent>
+        </NotAuthorized>
+    </AuthorizeView>
 </MudLayout>
 
 @code {
