@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MudBlazor.Services;
 using System;
@@ -17,28 +16,24 @@ namespace GraniteExpress.Infrastructure
 {
     public static class ServiceRegistry
     {
-
         public static IServiceCollection RegisterServices(this IServiceCollection services)
         {
+            services.AddScoped<CurrentUserState>();
+            services.AddScoped<IDatabaseResolver, DatabaseResolver>();
+            services.AddBlazoredLocalStorage();
             services.AddRazorComponents()
                     .AddInteractiveServerComponents();
-            services.AddTransient<IDatabaseResolver, DatabaseResolver>();
-            services.AddScoped<CurrentUserState>();
-            services.AddBlazoredLocalStorage();
-;
-
 
             services.ApplyDatabaseMigrations();
 
-
             services.AddIdentity<User, IdentityRole>(options =>
-                {
-                    options.Password.RequireDigit = false;
-                    options.Password.RequireLowercase = false;
-                    options.Password.RequireUppercase = false;
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.User.RequireUniqueEmail = true;
-                })
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.User.RequireUniqueEmail = true;
+            })
                .AddEntityFrameworkStores<ApplicationDbContext>();
 
 
@@ -64,18 +59,14 @@ namespace GraniteExpress.Infrastructure
 
         public static void ApplyDatabaseMigrations(this IServiceCollection services)
         {
-            //using var scope = services.BuildServiceProvider().CreateScope();
-            //var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             services.AddDbContext<ApplicationDbContext>(m => m.UseSqlServer(e => e.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
-
-            List<string> databases = new() {"GraniteExpress5", "GraniteExpresstemp_test" };
-
-            foreach( var database in databases )
+            foreach (var database in AppSettings.Databases.Keys)
             {
                 using var _scope = services.BuildServiceProvider().CreateScope();
                 var _dbContext = _scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                _dbContext.Database.SetConnectionString($"Server=(localdb)\\Shuvro;Database={database};Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True");
+                var _databaseResolver = _scope.ServiceProvider.GetRequiredService<IDatabaseResolver>();
+                _dbContext.Database.SetConnectionString(_databaseResolver.GetConnectionString(database));
                 if (_dbContext.Database.GetMigrations().Count() > 0)
                 {
                     _dbContext.Database.Migrate();

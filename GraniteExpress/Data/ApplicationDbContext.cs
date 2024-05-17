@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using GraniteExpress.Infrastructure;
 using GraniteExpress.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -7,20 +8,22 @@ using TeamWorkServer.Services;
 
 namespace GraniteExpress.Data
 {
-	public class ApplicationDbContext : IdentityDbContext<User>
+    public class ApplicationDbContext : IdentityDbContext<User>
     {
+        private readonly CurrentUserState _currentUser;
         private readonly IDatabaseResolver _databaseResolver;
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IDatabaseResolver databaseResolver) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, CurrentUserState currentUser, IDatabaseResolver databaseResolver) : base(options)
         {
+            _currentUser = currentUser;
             _databaseResolver = databaseResolver;
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-		{
+        {
             modelBuilder.Entity<Currency>(entity =>
             {
-				entity.Property(e => e.DefaultValue)
-					.HasDefaultValue(decimal.Parse("1"));
+                entity.Property(e => e.DefaultValue)
+                    .HasDefaultValue(decimal.Parse("1"));
             });
 
             modelBuilder.Entity<User>()
@@ -103,22 +106,24 @@ namespace GraniteExpress.Data
         }
 
 
-        protected override async void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //try
-            //{
-                //ILocalStorageService localStorage = new();
-                var databaseConnectionString = "Server=(localdb)\\Shuvro;Database=GraniteExpress5;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
-                //var tenantConnectionString = await localStorage.GetItemAsync<string>(key: "Database");
-                if (!string.IsNullOrEmpty(databaseConnectionString))
+            try
+            {
+                var databaseName = _currentUser.Database;
+                if (!string.IsNullOrEmpty(databaseName))
                 {
-                    optionsBuilder.UseSqlServer($"Server=(localdb)\\Shuvro;Database={databaseConnectionString};Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True");
+                    optionsBuilder.UseSqlServer(_databaseResolver.GetConnectionString(databaseName));
                 }
-            //}
-            //catch (Exception)
-            //{
-            //    optionsBuilder.UseSqlServer($"Server=(localdb)\\Shuvro;Database=GraniteExpress5;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True");
-            //}
+                else
+                {
+                    optionsBuilder.UseSqlServer(_databaseResolver.GetConnectionString(AppSettings.Databases.Keys.FirstOrDefault()));
+                }
+            }
+            catch (Exception ex)
+            {
+                //optionsBuilder.UseSqlServer(_databaseResolver.GetConnectionString(AppSettings.Databases.Keys.FirstOrDefault()));
+            }
         }
 
 
