@@ -5,7 +5,7 @@
 <MudDialog>
     <DialogContent>
         <MudItem xs="12" Class="d-flex flex-column gap-3 mx-4 pa-5">
-            <MudSelect T="string" Label="Claims" MultiSelection="true" @bind-SelectedValues="SelectedClaims">
+            <MudSelect SelectAll="true" T="string" Label="Claims" MultiSelection="true" @bind-SelectedValues="SelectedClaims">
                 @foreach (var item in AppSettings.Components)
                 {
                     <MudSelectItem T="string" Value="@item.Key">@item.Value</MudSelectItem>

@@ -1,12 +1,24 @@
+using Blazored.LocalStorage;
+using GraniteExpress.Infrastructure;
 using GraniteExpress.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
+using TeamWorkServer.Services;
 
 namespace GraniteExpress.Data
 {
-	public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<User>(options)
-	{
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+	public class ApplicationDbContext : IdentityDbContext<User>
+    {
+        private readonly CurrentUserState _currentUser;
+        private readonly IDatabaseResolver _databaseResolver;
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, CurrentUserState currentUser, IDatabaseResolver databaseResolver) : base(options)
+        {
+            _currentUser = currentUser;
+            _databaseResolver = databaseResolver;
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
             modelBuilder.Entity<Currency>(entity =>
             {
@@ -91,6 +103,26 @@ namespace GraniteExpress.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
+        }
+
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            try
+            {
+                var databaseName = _currentUser.Database;
+                if (!string.IsNullOrEmpty(databaseName))
+                {
+                    optionsBuilder.UseSqlServer(_databaseResolver.GetConnectionString(databaseName));
+                }else
+                {
+                    optionsBuilder.UseSqlServer(_databaseResolver.GetConnectionString(AppSettings.Databases.Keys.FirstOrDefault()));
+                }
+            }
+            catch (Exception ex)
+            {
+                //optionsBuilder.UseSqlServer(_databaseResolver.GetConnectionString(AppSettings.Databases.Keys.FirstOrDefault()));
+            }
         }
 
 

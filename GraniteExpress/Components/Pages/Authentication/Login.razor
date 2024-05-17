@@ -7,14 +7,21 @@
 @inject NavigationManager _navigationManager
 
 <MudGrid Justify="Justify.Center">
-    <MudPaper Class="d-flex flex-column gap-3 mx-4 mt-14" Square=false Style="min-height: 60vh;align-content: center;justify-content: center;padding: 100px 85px;">
+    <MudPaper Class="d-flex flex-column gap-3 mx-4 mt-10" Square=false Style="min-height: 60vh;align-content: center;justify-content: center;padding: 100px 85px;">
         <MudText Style="font-size: 38px;font-weight: 500;text-align: center;" Typo="Typo.h3" Class="mb-7">Log In</MudText>
         <EditForm Model="@_login" OnValidSubmit="Submit" Enhance>
             <DataAnnotationsValidator />
             <MudItem>
                 <MudTextField Class="pb-5" @bind-Value="_login.Email" Immediate="true" Label="Email" Variant="Variant.Outlined" Margin="Margin.Dense" For="() => _login.Email" />
                 <MudTextField Class="pb-4" @bind-Value="_login.Password" Immediate="true" Label="Password" Margin="Margin.Dense" Variant="Variant.Outlined" InputType="@Password" Adornment="Adornment.End" AdornmentIcon="@PasswordIcon" OnAdornmentClick="ShowPassword" AdornmentAriaLabel="Show Password" For="() => _login.Password" />
-                @if (_errorMessage.Any())
+                <MudSelect Margin="Margin.Dense" Class="pb-4" Placeholder="Select Database" @bind-Value="Database" Required Variant="Variant.Outlined">
+                    @foreach(var database in AppSettings.Databases)
+                    {
+                        <MudSelectItem Value="@database.Key">@database.Value</MudSelectItem>
+                        
+                    }
+                </MudSelect>
+                    @if (_errorMessage.Any())
                 {
                     @foreach (var message in _errorMessage)
                     {
@@ -40,6 +47,7 @@
     private bool isShowPassword { get; set; } = false;
     private InputType Password = InputType.Password;
     private string PasswordIcon = Icons.Material.Filled.VisibilityOff;
+    private string Database = string.Empty;
 
     private List<string> _errorMessage { get; set; } = new();
 
@@ -50,7 +58,7 @@
             var user = (await AuthState).User;
             if (user is not null && user.Identity is not null && user.Identity.IsAuthenticated)
             {
-                _navigationManager.NavigateTo("/");
+                _navigationManager.NavigateTo("/", true);
             }
         }
         catch
@@ -79,16 +87,25 @@
     {
         try
         {
-            var response = await _authService.Login(_login);
-            if (response.IsSuccess)
+            if (!string.IsNullOrEmpty(Database))
             {
-                await ((AuthStateProvider)_authStateProvider).SetStateAsync(response.UserId);
-                _errorMessage.Clear();
-                _navigationManager.NavigateTo("/");
+                await _localStorageService.SetItemAsync<string>(key: "Database", data: Database);
+                _currentUser.SetDatabase(Database);
+                var response = await _authService.Login(_login);
+                if (response.IsSuccess)
+                {
+                    await ((AuthStateProvider)_authStateProvider).SetStateAsync(response.UserId);
+                    _errorMessage.Clear();
+                    _navigationManager.NavigateTo("/");
+                }
+                else
+                {
+                    _errorMessage = response.Message?.Split("/n").ToList();
+                }
             }
             else
             {
-                _errorMessage = response.Message?.Split("/n").ToList();
+                _snakBar.Add("Please Select a Database", Severity.Error);
             }
         }
         catch (Exception ex)

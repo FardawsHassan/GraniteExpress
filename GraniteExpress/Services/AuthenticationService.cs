@@ -1,5 +1,6 @@
 ﻿using Alumni.Services.Services;
 using Blazored.LocalStorage;
+using GraniteExpress.Data;
 using GraniteExpress.DtoModels;
 using GraniteExpress.Models;
 using GraniteExpress.Models.Enums;
@@ -22,6 +23,7 @@ namespace GraniteExpress.Services
 
     public class AuthenticationService : IAuthenticationService
     {
+        private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -30,8 +32,9 @@ namespace GraniteExpress.Services
         private readonly ILogger<AuthenticationService> _logger;
         private readonly ILocalStorageService _localStorageService;
 
-        public AuthenticationService(UserManager<User> userManager,ILocalStorageService localStorageService, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, IEmailService emailService, IDataProtectionService dataProtection, ILogger<AuthenticationService> logger)
+        public AuthenticationService(ApplicationDbContext context, UserManager<User> userManager,ILocalStorageService localStorageService, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, IEmailService emailService, IDataProtectionService dataProtection, ILogger<AuthenticationService> logger)
         {
+            _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
