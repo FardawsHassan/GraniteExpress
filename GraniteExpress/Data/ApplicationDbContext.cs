@@ -1,12 +1,21 @@
+using Blazored.LocalStorage;
 using GraniteExpress.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
+using TeamWorkServer.Services;
 
 namespace GraniteExpress.Data
 {
-	public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<User>(options)
-	{
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+	public class ApplicationDbContext : IdentityDbContext<User>
+    {
+        private readonly IDatabaseResolver _databaseResolver;
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IDatabaseResolver databaseResolver) : base(options)
+        {
+            _databaseResolver = databaseResolver;
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
             modelBuilder.Entity<Currency>(entity =>
             {
@@ -91,6 +100,25 @@ namespace GraniteExpress.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
+        }
+
+
+        protected override async void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            //try
+            //{
+                //ILocalStorageService localStorage = new();
+                var databaseConnectionString = _databaseResolver.GetConnectionString();
+                //var tenantConnectionString = await localStorage.GetItemAsync<string>(key: "Database");
+                if (!string.IsNullOrEmpty(databaseConnectionString))
+                {
+                    optionsBuilder.UseSqlServer($"Server=(localdb)\\Shuvro;Database={databaseConnectionString};Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True");
+                }
+            //}
+            //catch (Exception)
+            //{
+            //    optionsBuilder.UseSqlServer($"Server=(localdb)\\Shuvro;Database=GraniteExpress5;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True");
+            //}
         }
 
 

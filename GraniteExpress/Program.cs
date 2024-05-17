@@ -18,22 +18,22 @@ builder.Services.AddAuthorization(options =>
     }
 });
 
-builder.Services.AddAuthenticationCore()
-                .AddDbContext<ApplicationDbContext>(options =>
-                {
-                    options.UseSqlServer(connectionString);
-                }).AddIdentity<User, IdentityRole>(options =>
-                {
-                    options.Password.RequireDigit = false;
-                    options.Password.RequireLowercase = false;
-                    options.Password.RequireUppercase = false;
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.User.RequireUniqueEmail = true;
-                }).AddDefaultTokenProviders()
-                  .AddEntityFrameworkStores<ApplicationDbContext>();
+//builder.Services.AddAuthenticationCore()
+//                .AddDbContext<ApplicationDbContext>(options =>
+//                {
+//                    options.UseSqlServer(connectionString);
+//                }).AddIdentity<User, IdentityRole>(options =>
+//                {
+//                    options.Password.RequireDigit = false;
+//                    options.Password.RequireLowercase = false;
+//                    options.Password.RequireUppercase = false;
+//                    options.Password.RequireNonAlphanumeric = false;
+//                    options.User.RequireUniqueEmail = true;
+//                }).AddDefaultTokenProviders()
+//                  .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.RegisterServices();
-builder.Services.ApplyDatabaseMigrations();
+//builder.Services.ApplyDatabaseMigrations();
 
 var app = builder.Build();
 

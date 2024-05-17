@@ -79,6 +79,8 @@
     {
         try
         {
+            // await _localStorageService.SetItemAsync<string>(key: "Database", data: "GraniteExpress5");
+            _currentUser.SetDatabase("GraniteExpress5");
             var response = await _authService.Login(_login);
             if (response.IsSuccess)
             {
