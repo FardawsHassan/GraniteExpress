@@ -108,7 +108,7 @@ namespace GraniteExpress.Data
             //try
             //{
                 //ILocalStorageService localStorage = new();
-                var databaseConnectionString = _databaseResolver.GetConnectionString();
+                var databaseConnectionString = "Server=(localdb)\\Shuvro;Database=GraniteExpress5;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
                 //var tenantConnectionString = await localStorage.GetItemAsync<string>(key: "Database");
                 if (!string.IsNullOrEmpty(databaseConnectionString))
                 {
