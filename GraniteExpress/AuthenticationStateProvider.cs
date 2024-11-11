@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using GraniteExpress.Infrastructure;
 using GraniteExpress.Services;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
@@ -11,12 +12,14 @@ namespace GraniteExpress
         private readonly ILocalStorageService _localStorageService;
         private readonly IUserService _userService;
         private readonly CurrentUserState currentUser;
+        private readonly NavigationManager _navigator;
 
-        public AuthStateProvider(ILocalStorageService localStorageService, IUserService userService, CurrentUserState _currentUser)
+        public AuthStateProvider(ILocalStorageService localStorageService, IUserService userService, CurrentUserState _currentUser, NavigationManager navigator)
         {
             _localStorageService = localStorageService;
             _userService = userService;
             currentUser = _currentUser;
+            _navigator = navigator;
         }
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
@@ -24,10 +27,21 @@ namespace GraniteExpress
             try
             {
                 var userId = await _localStorageService.GetItemAsync<string>(key: "AuthKey");
+                var databaseName = await _localStorageService.GetItemAsync<string>(key: "Database");
+                if (!string.IsNullOrEmpty(databaseName))
+                {
+                    currentUser.SetDatabase(databaseName);
+                }
+                else
+                {
+                    await ClearStateAsync();
+                    _navigator.NavigateTo("login");
+                }
 
                 if (!string.IsNullOrEmpty(userId))
                 {
                     var user = await _userService.GetUserById(userId);
+                    currentUser.SetState(userId, user.Email, user.UserRole);
 
                     if (user is not null)
                     {
@@ -38,7 +52,7 @@ namespace GraniteExpress
                             new Claim(ClaimTypes.Role, user.UserRole)
                         };
 
-                        foreach(var item in user.Claims)
+                        foreach (var item in user.Claims)
                         {
                             listOfClaims.Add(new Claim(item.Key, item.Value));
                         }
@@ -46,7 +60,11 @@ namespace GraniteExpress
 
                         identity = new ClaimsIdentity((listOfClaims), "Authentication");
                     }
-
+                }
+                else
+                {
+                    await ClearStateAsync();
+                    _navigator.NavigateTo("login");
                 }
 
                 var state = new AuthenticationState(new ClaimsPrincipal(identity));
@@ -73,6 +91,7 @@ namespace GraniteExpress
         public async Task ClearStateAsync()
         {
             await _localStorageService.RemoveItemAsync("AuthKey");
+            await _localStorageService.RemoveItemAsync("Database");
 
             var state = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 

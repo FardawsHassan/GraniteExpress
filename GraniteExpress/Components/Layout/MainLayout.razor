@@ -6,19 +6,28 @@
 <MudSnackbarProvider />
 
 
-<MudLayout>
+<MudLayout Style="min-height: 100vh">
     <AuthorizeView>
         <Authorized>
             <MudAppBar>
                 <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-                    <MudSpacer />
-                <MudButton Variant=Variant.Text Style="color:white;text-transform: capitalize;" OnClick="Logout" >Log Out</MudButton>
+                <MudSpacer />
+                <MudButton Variant=Variant.Text Style="color:white;text-transform: capitalize;" OnClick="Logout">Log Out</MudButton>
             </MudAppBar>
+            <MudPaper Class="footer">
+                <MudItem Class="d-flex flex-row justify-content-start gap-3 my-auto">
+                    <MudText Class="my-auto">@_currentUser.UserName</MudText>
+                    <MudItem Class="divider"></MudItem>
+                    <MudText Class="my-auto">@_currentUser.Role</MudText>
+                    <MudItem Class="divider"></MudItem>
+                    <MudText Style="margin:auto 0">@_currentUser.Database ( @AppSettings.Databases[_currentUser.Database] ) </MudText>
+                </MudItem>
+            </MudPaper>
             <MudDrawer @bind-Open="@_drawerOpen">
-                <NavMenu/>
+                <NavMenu />
             </MudDrawer>
             <MudMainContent>
-                <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="px-10 py-7">
+                <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="px-10 py-7 mb-7">
                     @Body
                 </MudContainer>
             </MudMainContent>
@@ -35,6 +44,41 @@
         </NotAuthorized>
     </AuthorizeView>
 </MudLayout>
+
+<style>
+    .footer {
+        position: fixed;
+        z-index: 1000000;
+        bottom: 0;
+        display: flex;
+        height: 36px;
+        background: darkslategrey;
+        width: 100%;
+        padding: 0 36px;
+        opacity: 1;
+    }
+
+    .footer p{
+        font-size: 14px;
+    }
+
+    .divider {
+        width: 1px;
+        height: 24px;
+        background-color: #173e3e;
+        margin: auto;
+    }
+
+    aside {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+        aside::-webkit-scrollbar {
+            display: none;
+        }
+
+</style>
 
 @code {
     private MudTheme _theme = new();
@@ -70,6 +114,6 @@
     private async Task Logout()
     {
         await ((AuthStateProvider)_authStateProvider).ClearStateAsync();
-        _navigationManager.NavigateTo("login");
+        _navigationManager.NavigateTo("login", true);
     }
 }
