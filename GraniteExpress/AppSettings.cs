@@ -47,12 +47,12 @@
     public class Settings
     {
         // Database Information
-        public string ServerName { get; set; } = "(localdb)\\Shuvro";
+        public string ServerName { get; set; } = "(localdb)\\MSSQLLocalDB";
         public string DatabaseUserId { get; set; } = "";
         public string DatabasePassword { get; set; } = "";
 
         // Email Setitngs
-        public string AppUrl { get; set; } = "https://localhost:7239";
+        public string AppUrl { get; set; } = "https://localhost:7054";
         public string ProtectionKey { get; set; } = "kdPzE27PwAON4RDcNIEyClVzBw9VCaGw";
         public string AdminEmail { get; set; } = "admin@gmail.com";
         public string AdminPassword { get; set; } = "admin123@";

@@ -1,4 +1,4 @@
-USE [GraniteExpress5]
+USE [GraniteExpress1]
 GO
 
 INSERT INTO [dbo].[Clientype]
@@ -35,9 +35,9 @@ INSERT INTO [dbo].[RefClient]
            ,[ClientCode])
      VALUES
            (1
-           ,'Saima'
-           ,'Sultana'
-           ,'SM33')
+           ,'Altaf'
+           ,'Hossain'
+           ,'AH33')
 GO
 
 
@@ -67,7 +67,7 @@ INSERT INTO [dbo].[RefDocumentType]
            ,[DocumentCode]
            ,[DocumentMaxValue])
      VALUES
-           ('document_type_1',
+           ('Financial',
            1211121,
            111)
 		   
@@ -76,7 +76,7 @@ INSERT INTO [dbo].[RefDocumentType]
            ,[DocumentCode]
            ,[DocumentMaxValue])
      VALUES
-           ('document_type_2',
+           ('Tax',
            1211545,
            121)
 GO
@@ -94,7 +94,7 @@ INSERT INTO [dbo].[RefAccountType]
            ,[EquityId])
      VALUES
            (101120
-           ,'Account_Type_1'
+           ,'Purchase Account'
            ,1
 		   ,null,null,null,null)
 
@@ -108,7 +108,7 @@ INSERT INTO [dbo].[RefAccountType]
            ,[EquityId])
      VALUES
            (101120
-           ,'Account_Type_2'
+           ,'Assets Account'
            ,0
 		   ,null,null,null,null)
 
@@ -122,7 +122,7 @@ INSERT INTO [dbo].[RefAccountType]
            ,[EquityId])
      VALUES
            (101120
-           ,'Account_Type_3'
+           ,'Sells Account'
            ,1
 		   ,null,null,null,null)
 
@@ -245,7 +245,7 @@ INSERT INTO [dbo].[RefCashFlow]
            ,[IsVisible])
      VALUES
            (null
-           ,'test Description 1'
+           ,'Addition to Cash'
            ,1)
 GO
 
@@ -255,7 +255,7 @@ INSERT INTO [dbo].[RefCashFlow]
            ,[IsVisible])
      VALUES
            (null
-           ,'test Description 2'
+           ,'Substraction to Cash'
            ,1)
 GO
 
@@ -265,7 +265,7 @@ INSERT INTO [dbo].[RefCashFlow]
            ,[IsVisible])
      VALUES
            (null
-           ,'test Description 3'
+           ,'Net Cash form operations'
            ,1)
 GO
 
@@ -275,7 +275,7 @@ INSERT INTO [dbo].[RefCashFlow]
            ,[IsVisible])
      VALUES
            (null
-           ,'test Description 4'
+           ,'Investment'
            ,1)
 GO
 

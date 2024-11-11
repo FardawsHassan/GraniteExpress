@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GraniteExpress.Models
+namespace GraniteExpress.DtoModels
 {
-    public class Account
+    public class AccountDto
     {
-        [Key]
         public int AccountId { get; set; }
         [Required]
         public string AccountCode { get; set; }
@@ -17,9 +16,9 @@ namespace GraniteExpress.Models
         [Required]
         public bool IsActive { get; set; }
 
-        public virtual AccountType AccountType { get; set; }
-        public virtual Currency Currency { get; set; }
-        public virtual List<JournalDetail> JournalDetail { get; set; }
-        public virtual List<TemplateDetails> TemplateDetails { get; set; }
+        public virtual AccountTypeDto AccountType { get; set; }
+        public virtual CurrencyDto Currency { get; set; }
+        public virtual List<JournalDetailDto> JournalDetail { get; set; }
+        public virtual List<TemplateDetailsDto> TemplateDetails { get; set; }
     }
 }

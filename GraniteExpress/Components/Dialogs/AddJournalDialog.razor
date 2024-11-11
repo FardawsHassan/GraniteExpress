@@ -133,7 +133,7 @@
                             </MudItem>
                         </MudTd>
                         <MudTd DataLabel="Client Code">
-                            <MudItem Style="min-height:40px;" @onclick=@(() => OpenClientSelectDialog(context))>
+                            <MudItem Style="min-height:40px;" @onclick=@(() => OpenClientSelectDialog())>
                                 @{
                                     var client = Clients.Where(x => x.ClientId == context.ClientId).FirstOrDefault();
                                     <MudTextField Value="@(client is not null ? client.ClientCode : " ")" ReadOnly Margin="Margin.Dense"></MudTextField>
@@ -141,7 +141,7 @@
                             </MudItem>
                         </MudTd>
                         <MudTd DataLabel="Client Name">
-                            <MudItem Style="min-height:40px;" @onclick=@(() => OpenClientSelectDialog(context))>
+                            <MudItem Style="min-height:40px;" @onclick=@(() => OpenClientSelectDialog())>
                                 @{
                                     var client = Clients.Where(x => x.ClientId == context.ClientId).FirstOrDefault();
                                     <MudTextField Value="@(client is not null ? client.ClientFirstName + " " + client.ClientLastName : " ")" ReadOnly Margin="Margin.Dense"></MudTextField>
@@ -199,7 +199,7 @@
                             }
                         </MudTd>
                         <MudTd DataLabel="Cash Flow">
-                            <MudItem Style="min-height:40px;" @onclick=@(() => OpenCashFlowSelectDialog(context))>
+                            <MudItem Style="min-height:40px;" @onclick=@(() => OpenCashFlowSelectDialog())>
                                 @{
                                     var cashFlow = CashFlows.Where(x => x.CashFlowId == context.CashFlowId).FirstOrDefault();
                                     // <MudTextField Value="@(cashFlow is not null ? cashFlow.CashFlowDescription : " ")" ReadOnly Margin="Margin.Dense"></MudTextField>
@@ -281,20 +281,20 @@
     [Parameter]
     public int EditJournalId { get; set; } = 0;
 
-    public List<Journal> JournalList = new List<Journal>();
+    public List<JournalDto> JournalList = new ();
     private DialogOptions _dialogOption = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true, CloseButton = true };
 
-    public Journal Journal { get; set; } = new();
-    public Account SelectedAccount { get; set; } = new();
+    public JournalDto Journal { get; set; } = new();
+    public AccountDto SelectedAccount { get; set; } = new();
 
-    List<DocumentType> DocumentTypes = new();
-    List<Template> Templates = new();
-    List<Account> Accounts = new();
-    List<Client> Clients = new();
-    List<Currency> Currencies = new();
-    List<CashFlow> CashFlows = new();
+    List<DocumentTypeDto> DocumentTypes = new();
+    List<TemplateDto> Templates = new();
+    List<AccountDto> Accounts = new();
+    List<ClientDto> Clients = new();
+    List<CurrencyDto> Currencies = new();
+    List<CashFlowDto> CashFlows = new();
 
-    MudTable<JournalDetail> JournalDetailTable = new();
+    MudTable<JournalDetailDto> JournalDetailTable = new();
     MudTextField<string> _documentTypeField = new();
     MudTextField<string> _TemplateField = new();
     MudTextField<string> _JournalClientField = new();
@@ -374,14 +374,14 @@
         Journal.JournalDetail.Add(lastJournal);
     }
 
-    private async Task OpenAccountSelectDialog(JournalDetail journalDetail)
+    private async Task OpenAccountSelectDialog(JournalDetailDto journalDetail)
     {
         var dialog = _dialog.Show<AccountDialog>("Select Account", _dialogOption);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
-            var account = result.Data as Account;
+            var account = result.Data as AccountDto;
             JournalDetailTable.SelectedItem.AccountId = account.AccountId;
 
             if (journalDetail == Journal.JournalDetail.Last())
@@ -430,14 +430,14 @@
     //     }
     // }
 
-    private async Task OpenClientSelectDialog(JournalDetail journalDetail)
+    private async Task OpenClientSelectDialog()
     {
         var dialog = _dialog.Show<ClientDialog>("Select Client", _dialogOption);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
-            var client = result.Data as Client;
+            var client = result.Data as ClientDto;
             JournalDetailTable.SelectedItem.ClientId = client.ClientId;
         }
         StateHasChanged();
@@ -450,7 +450,7 @@
 
         if (!result.Canceled)
         {
-            var client = result.Data as Client;
+            var client = result.Data as ClientDto;
             Journal.ClientId = client.ClientId;
             clientError = false;
             await _JournalClientField.SetText(client.ClientFirstName + " " + client.ClientLastName);
@@ -466,7 +466,7 @@
 
         if (!result.Canceled)
         {
-            var documentType = result.Data as DocumentType;
+            var documentType = result.Data as DocumentTypeDto;
             Journal.DocumentTypeId = documentType.DocumentTypeId;
             documentTypeError = false;
             await _documentTypeField.SetText(documentType.DocumentName);
@@ -474,14 +474,14 @@
         StateHasChanged();
     }
 
-    private async Task OpenCashFlowSelectDialog(JournalDetail journalDetail)
+    private async Task OpenCashFlowSelectDialog()
     {
         var dialog = _dialog.Show<AddCashFlowDialog>("Select Cash Flow", _dialogOption);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
-            var cashFlow = result.Data as CashFlow;
+            var cashFlow = result.Data as CashFlowDto;
             JournalDetailTable.SelectedItem.CashFlowId = cashFlow.CashFlowId;
         }
         StateHasChanged();
@@ -494,11 +494,11 @@
 
         if (!result.Canceled)
         {
-            var template = result.Data as Template;
+            var template = result.Data as TemplateDto;
             Journal.TemplateId = template.TemplateId;
             var lastJournalDetail = Journal.JournalDetail.Last();
             Journal.JournalDetail.Remove(lastJournalDetail);
-            Journal.JournalDetail.AddRange(template.TemplateDetail.Select(x => new JournalDetail
+            Journal.JournalDetail.AddRange(template.TemplateDetail.Select(x => new JournalDetailDto
                 {
                     AccountId = x.AccountId,
                     IsDebit = x.IsDebit
@@ -510,5 +510,5 @@
         StateHasChanged();
     }
 
-    private void RemoveRow(JournalDetail journalDetail) => Journal.JournalDetail.Remove(journalDetail);
+    private void RemoveRow(JournalDetailDto journalDetail) => Journal.JournalDetail.Remove(journalDetail);
 }

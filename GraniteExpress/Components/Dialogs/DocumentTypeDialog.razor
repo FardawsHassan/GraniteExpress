@@ -1,4 +1,5 @@
 ﻿@inject IDocumentService _documentTypeService
+
 <MudDialog>
     <DialogContent>
         <MudTable Items="DocumentTypes" @ref=mudtable @bind-SelectedItem="SelectedDocumentType" Class="mb-5" Dense>
@@ -45,15 +46,15 @@
 @code {
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
-    MudTable<DocumentType> mudtable = new();
+    MudTable<DocumentTypeDto> mudtable = new();
 
-    List<DocumentType> DocumentTypes = new();
-    DocumentType SelectedDocumentType = new();
+    List<DocumentTypeDto> DocumentTypes = new();
+    DocumentTypeDto SelectedDocumentType = new();
 
     protected override async Task OnInitializedAsync()
     {
         DocumentTypes = await _documentTypeService.GetDocumentTypes();
     }
 
-    public void RowSelected(DocumentType documentType) => MudDialog.Close(DialogResult.Ok(documentType));
+    public void RowSelected(DocumentTypeDto documentType) => MudDialog.Close(DialogResult.Ok(documentType));
 }

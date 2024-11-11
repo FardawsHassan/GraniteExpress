@@ -5,14 +5,13 @@ using GraniteExpress.Models;
 using GraniteExpress.Models.Enums;
 using GraniteExpress.Response;
 using Microsoft.AspNetCore.Identity;
-using Org.BouncyCastle.Bcpg;
 using System.Data;
 namespace GraniteExpress.Services
 {
     public interface IAuthenticationService
     {
-        Task<UnitResponse> Register(DtoModels.RegisterRequest registerRequest);
-        Task<LoginResponse> Login(DtoModels.LoginRequest loginRequest);
+        Task<UnitResponse> Register(RegisterRequest registerRequest);
+        Task<LoginResponse> Login(LoginRequest loginRequest);
         Task<UnitResponse> ResendConfirmationEmail(ConfimationMailRequest confimationMail);
         Task<UnitResponse> ConfirmEmail(string id, string token);
         Task<UnitResponse> ForgotPassword(ForgotPasswordRequest forgotPassword);
@@ -41,7 +40,7 @@ namespace GraniteExpress.Services
             _localStorageService = localStorageService;
         }
 
-        public async Task<UnitResponse> Register(DtoModels.RegisterRequest registerRequest)
+        public async Task<UnitResponse> Register(RegisterRequest registerRequest)
         {
             try
             {
@@ -54,9 +53,9 @@ namespace GraniteExpress.Services
                     };
                 }
 
-                var hasUser = await _userManager.FindByEmailAsync(registerRequest.Email);
+                var existingUser = await _userManager.FindByEmailAsync(registerRequest.Email);
 
-                if (hasUser is not null)
+                if (existingUser is not null)
                 {
                     return new() { IsSuccess = false, Message = "User already exits! Please Log in" };
                 }
@@ -68,7 +67,7 @@ namespace GraniteExpress.Services
                     NormalizedEmail = registerRequest.Email,
                     NormalizedUserName = registerRequest.Email,
                     SecurityStamp = Guid.NewGuid().ToString(),
-                    EmailConfirmed = true,
+                    EmailConfirmed = false,
                 };
 
                 var newUser = await _userManager.CreateAsync(user, registerRequest.Password);
@@ -98,6 +97,7 @@ namespace GraniteExpress.Services
             }
             catch (Exception ex)
             {
+                _logger.LogError($"Method->Register Error->{ex.Message}");
                 return new()
                 {
                     IsSuccess = false,
@@ -106,12 +106,12 @@ namespace GraniteExpress.Services
             }
         }
 
-        public async Task<LoginResponse> Login(DtoModels.LoginRequest loginRequest)
+        public async Task<LoginResponse> Login(LoginRequest loginRequest)
         {
             try
             {
-                var hasUser = await _userManager.FindByEmailAsync(loginRequest.Email);
-                if (hasUser is null)
+                var user = await _userManager.FindByEmailAsync(loginRequest.Email);
+                if (user is null)
                 {
                     return new()
                     {
@@ -120,7 +120,7 @@ namespace GraniteExpress.Services
                     };
                 }
 
-                var login = await _signInManager.CheckPasswordSignInAsync(hasUser, loginRequest.Password, true);
+                var login = await _signInManager.CheckPasswordSignInAsync(user, loginRequest.Password, true);
 
                 if (!login.Succeeded)
                 {
@@ -134,12 +134,13 @@ namespace GraniteExpress.Services
                 return new()
                 {
                     IsSuccess = true,
-                    UserId = hasUser.Id,
+                    UserId = user.Id,
                     Message = "Login successful!"
                 };
             }
             catch (Exception ex)
             {
+                _logger.LogError($"Method->Login Error->{ex.Message}");
                 return new()
                 {
                     IsSuccess = false,
@@ -147,7 +148,6 @@ namespace GraniteExpress.Services
                 };
             }
         }
-
 
         public async Task<UnitResponse> ResendConfirmationEmail(ConfimationMailRequest confimationMail)
         {
@@ -162,9 +162,9 @@ namespace GraniteExpress.Services
                     };
                 }
 
-                var hasUser = await _userManager.FindByEmailAsync(confimationMail.Email);
+                var user = await _userManager.FindByEmailAsync(confimationMail.Email);
 
-                if (hasUser is null)
+                if (user is null)
                 {
                     return new()
                     {
@@ -173,7 +173,8 @@ namespace GraniteExpress.Services
                     };
                 }
 
-                var IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(hasUser);
+                var IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+
                 if (IsEmailConfirmed)
                 {
                     return new()
@@ -182,11 +183,10 @@ namespace GraniteExpress.Services
                         Message = "Email already verified!"
                     };
                 }
-
-                var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(hasUser);
+                var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
                 var encryptEmailToken = await _dataProtection.Encrypt(emailToken);
-                await _emailService.SendEmailConfirmationAsync(hasUser.Id, hasUser.Email, encryptEmailToken, EmailSubjectEnum.EmailConfirmation);
+                await _emailService.SendEmailConfirmationAsync(user.Id, user.Email!, encryptEmailToken, EmailSubjectEnum.EmailConfirmation);
 
                 return new()
                 {
@@ -209,8 +209,8 @@ namespace GraniteExpress.Services
         {
             try
             {
-                var hasUser = await _userManager.FindByIdAsync(id);
-                if (hasUser is null)
+                var user = await _userManager.FindByIdAsync(id);
+                if (user is null)
                 {
                     return new()
                     {
@@ -229,7 +229,7 @@ namespace GraniteExpress.Services
                 }
 
                 var decryptEmailToken = await _dataProtection.Decrypt(token);
-                var response = await _userManager.ConfirmEmailAsync(hasUser, decryptEmailToken);
+                var response = await _userManager.ConfirmEmailAsync(user, decryptEmailToken);
 
                 if (!response.Succeeded)
                 {
@@ -271,8 +271,8 @@ namespace GraniteExpress.Services
                     };
                 }
 
-                var hasUser = await _userManager.FindByEmailAsync(forgotPassword.Email);
-                if (hasUser is null)
+                var user = await _userManager.FindByEmailAsync(forgotPassword.Email);
+                if (user is null)
                 {
                     return new()
                     {
@@ -281,10 +281,10 @@ namespace GraniteExpress.Services
                     };
                 }
 
-                var resetPasswordToken = await _userManager.GeneratePasswordResetTokenAsync(hasUser);
+                var resetPasswordToken = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var encryptedResetPasswordToken = await _dataProtection.Encrypt(resetPasswordToken);
 
-                await _emailService.SendEmailConfirmationAsync(hasUser.Id, hasUser.Email, encryptedResetPasswordToken, EmailSubjectEnum.ResetPasswordEmail);
+                await _emailService.SendEmailConfirmationAsync(user.Id, user.Email!, encryptedResetPasswordToken, EmailSubjectEnum.ResetPasswordEmail);
                 return new()
                 {
                     IsSuccess = true,
@@ -302,12 +302,12 @@ namespace GraniteExpress.Services
             }
         }
 
-        public async Task<UnitResponse> ResetPassword(DtoModels.ResetPasswordRequest resetPassword, string id, string token)
+        public async Task<UnitResponse> ResetPassword(ResetPasswordRequest resetPassword, string id, string token)
         {
             try
             {
-                var hasUser = await _userManager.FindByIdAsync(id);
-                if (hasUser is null)
+                var user = await _userManager.FindByIdAsync(id);
+                if (user is null)
                 {
                     return new()
                     {
@@ -326,7 +326,7 @@ namespace GraniteExpress.Services
                 }
 
                 var decryptEmailToken = await _dataProtection.Decrypt(token);
-                var response = await _userManager.ResetPasswordAsync(hasUser, decryptEmailToken, resetPassword.Password);
+                var response = await _userManager.ResetPasswordAsync(user, decryptEmailToken, resetPassword.Password);
 
                 if (!response.Succeeded)
                 {
@@ -338,9 +338,9 @@ namespace GraniteExpress.Services
                     };
                 }
 
-                if (await _userManager.IsLockedOutAsync(hasUser))
+                if (await _userManager.IsLockedOutAsync(user))
                 {
-                    await _userManager.SetLockoutEndDateAsync(hasUser, DateTimeOffset.UtcNow);
+                    await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow);
                 }
 
                 return new()
@@ -366,9 +366,9 @@ namespace GraniteExpress.Services
             try
             {
                 var userID = await _localStorageService.GetItemAsync<string>(key: "AuthKey");
-                var hasUser = await _userManager.FindByIdAsync(userID);
+                var user = await _userManager.FindByIdAsync(userID);
 
-                var response = await _userManager.ChangePasswordAsync(hasUser, currentPassword, newPassword);
+                var response = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
                 if (!response.Succeeded)
                 {
                     var errorList = response.Errors.ToList();
@@ -379,9 +379,9 @@ namespace GraniteExpress.Services
                     };
                 }
 
-                if (await _userManager.IsLockedOutAsync(hasUser))
+                if (await _userManager.IsLockedOutAsync(user))
                 {
-                    await _userManager.SetLockoutEndDateAsync(hasUser, DateTimeOffset.UtcNow);
+                    await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow);
                 }
 
                 return new()

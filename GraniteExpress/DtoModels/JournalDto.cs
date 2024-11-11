@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace GraniteExpress.Models
+namespace GraniteExpress.DtoModels
 {
-    public class Journal
+    public class JournalDto
     {
-        [Key]
         public int JournalId { get; set; }
         public int? TemplateId { get; set; }
         [Required]
@@ -22,12 +20,11 @@ namespace GraniteExpress.Models
         public string UserId { get; set; }
         [Required]
         public bool IsDelete { get; set; } = false;
-
-
-        public virtual List<JournalDetail>? JournalDetail { get; set; }
-        public virtual DocumentType? DocumentType { get; set; }
-        public virtual Template? Template { get; set; }
-        public virtual Client? Client { get; set; }
-        public virtual User? User { get; set; }
+        
+        public virtual List<JournalDetailDto> JournalDetail { get; set; }
+        //public virtual DocumentTypeDto DocumentType { get; set; }
+        //public virtual TemplateDto Template { get; set; }
+        //public virtual ClientDto Client { get; set; }
+        //public virtual UserDto User { get; set; }
     }
 }

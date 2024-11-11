@@ -1,5 +1,6 @@
 ﻿using Alumni.Services.Services;
 using Blazored.LocalStorage;
+using CarerHub.Services.ModelMapper;
 using GraniteExpress.Data;
 using GraniteExpress.Models;
 using GraniteExpress.Services;
@@ -7,9 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using MudBlazor.Services;
-using System;
 using TeamWorkServer.Services;
 
 namespace GraniteExpress.Infrastructure
@@ -33,11 +32,9 @@ namespace GraniteExpress.Infrastructure
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.User.RequireUniqueEmail = true;
+                options.SignIn.RequireConfirmedEmail = false;
             })
                .AddEntityFrameworkStores<ApplicationDbContext>();
-
-
-
 
             services.AddSingleton<IAuthorizationMiddlewareResultHandler, AuthorizationMiddlewareResultHandler>()
                     .AddScoped<AuthenticationStateProvider, AuthStateProvider>()
@@ -52,6 +49,8 @@ namespace GraniteExpress.Infrastructure
                     .AddScoped<IDataProtectionService, DataProtectionService>()
                     .AddScoped<IAuthenticationService, AuthenticationService>()
                     .AddScoped<IUserService, UserService>()
+                    .AddCascadingAuthenticationState()
+                    .AddAutoMapper(typeof(MapperProfile))
                     .AddMudServices();
 
             return services;

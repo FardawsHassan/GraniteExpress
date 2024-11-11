@@ -13,10 +13,10 @@ namespace GraniteExpress.Models
         public string ClientCode { get; set; }
 
 
-        public Clientype clienType { get; set; }
-        public List<JournalDetail> JournalDetail { get; set; }
-        public List<Journal> Journals { get; set; }
-        public List<TemplateDetails> TemplateDetails { get; set; }
+        public virtual Clientype clienType { get; set; }
+        public virtual List<JournalDetail> JournalDetail { get; set; }
+        public virtual List<Journal> Journals { get; set; }
+        public virtual List<TemplateDetails> TemplateDetails { get; set; }
         //begenningBalance
     }
 }

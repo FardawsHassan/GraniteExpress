@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GraniteExpress.Models
+namespace GraniteExpress.DtoModels
 {
-    public class AccountType
+    public class AccountTypeDto
     {
-        [Key]
         public int AccountTypeId { get; set; }
         [Required]
         public string AccountTypeCode { get; set; }
@@ -12,11 +11,11 @@ namespace GraniteExpress.Models
         public string AccountTypeName { get; set; }
         [Required]
         public bool IsDebit { get; set; }
-        public int? BalanceId { get; set; } //
+        public int? BalanceId { get; set; } // future
         public int? CashId { get; set; } //
         public int? IncomeId { get; set; } //
         public int? EquityId { get; set; } //
 
-        public virtual List<Account> Accounts { get; set; }
+        public virtual List<AccountDto> Accounts { get; set; }
     }
 }

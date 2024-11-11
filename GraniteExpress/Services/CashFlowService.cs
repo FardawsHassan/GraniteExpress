@@ -1,26 +1,40 @@
-﻿using GraniteExpress.Data;
-using GraniteExpress.Models;
+﻿using AutoMapper;
+using GraniteExpress.Data;
+using GraniteExpress.DtoModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace GraniteExpress.Services
 {
     public interface ICashFlowService
     {
-        Task<List<CashFlow>> GetCashFlows();
+        Task<List<CashFlowDto>> GetCashFlows();
     }
 
     public class CashFlowService : ICashFlowService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
+        private readonly ILogger<CashFlowService> _logger;
 
-        public CashFlowService(ApplicationDbContext context)
+        public CashFlowService(ApplicationDbContext context, IMapper mapper, ILogger<CashFlowService> logger)
         {
             _context = context;
+            _mapper = mapper;
+            _logger = logger;
         }
 
-        public async Task<List<CashFlow>> GetCashFlows()
+        public async Task<List<CashFlowDto>> GetCashFlows()
         {
-            var CashFlows =  _context.RefCashFlow.ToList();
-            return CashFlows;
+            try
+            {
+                var cashFlows =  await _context.RefCashFlow.ToListAsync();
+                return _mapper.Map<List<CashFlowDto>>(cashFlows);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Method->GetCashFlows Error->{ex.Message}");
+                return null;
+            }
         }
     }
 }

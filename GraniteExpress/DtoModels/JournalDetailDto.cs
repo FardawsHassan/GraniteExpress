@@ -1,11 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
-namespace GraniteExpress.Models
+namespace GraniteExpress.DtoModels
 {
-    public class JournalDetail
+    public class JournalDetailDto
     {
-        [Key]
         public int JournalDetailId { get; set; }
         [Required]
         public int JournalId { get; set; }
@@ -19,8 +18,8 @@ namespace GraniteExpress.Models
         public decimal? ExchangeRate { get; set; }
         public int? CashFlowId { get; set; } //
         
-        public virtual Journal? Journal { get; set; }
-        public virtual Account? Account { get; set; }
-        public virtual CashFlow? CashFlow { get; set; }
+        public virtual JournalDto Journal { get; set; }
+        public virtual AccountDto Account { get; set; }
+        public virtual CashFlowDto CashFlow { get; set; }
     }
 }

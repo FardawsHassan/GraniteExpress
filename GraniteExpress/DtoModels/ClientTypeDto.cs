@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace GraniteExpress.Models
+namespace GraniteExpress.DtoModels
 {
-    public class Clientype
+    public class ClientypeDto
     {
-        [Key]
         public int Id { get; set; }
         [Required]
         public string ClientType { get; set; }
 
-        public virtual List<Client> Clients { get; set; }
+        public virtual List<ClientDto> Clients { get; set; }
     }
 }

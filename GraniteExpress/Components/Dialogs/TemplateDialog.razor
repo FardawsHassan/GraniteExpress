@@ -74,22 +74,22 @@
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
 
-    MudTable<Template> mudtable = new();
+    MudTable<TemplateDto> mudtable = new();
 
-    List<Template> Templates = new();
-    Template SelectedTemplate = new();
+    List<TemplateDto> Templates = new();
+    TemplateDto SelectedTemplate = new();
 
     protected override async Task OnInitializedAsync()
     {
         Templates = await _templateService.GetTemplates();
     }
 
-    public void RowSelected(Template template)
+    public void RowSelected(TemplateDto template)
     {
         MudDialog.Close(DialogResult.Ok(template));
     }
     
-    public void TemplateDetailsChanged(Template template)
+    public void TemplateDetailsChanged(TemplateDto template)
     {
         // MudDialog.Close(DialogResult.Ok(template));
     }

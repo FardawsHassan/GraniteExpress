@@ -2,7 +2,6 @@
 @inject IJournalService _journalService
 @attribute [Authorize]
 
-
 <MudItem xs=6 Class="d-flex gap-4 mb-6 mt-4">
     <MudDateRangePicker Variant=Variant.Outlined PickerVariant=PickerVariant.Inline @bind-DateRange="@_dateRange" Class="mr-3" Margin="Margin.Dense" />
     <MudButton OnClick="GetSeletJournals" Class="px-6" Variant="Variant.Filled" Color="Color.Primary">GetJournals</MudButton>
@@ -17,7 +16,7 @@
         </PropertyColumn>
         <PropertyColumn Property="x => x.DocumentDate" Title="Document Date">
             <CellTemplate>
-                @if(context.Item.DocumentDate is not null)
+                @if (context.Item.DocumentDate is not null)
                 {
                     @context.Item.DocumentDate.Value.ToString("yyyy/MM/dd")
                 }
@@ -82,11 +81,11 @@
 
     protected async Task GetSeletJournals()
     {
-        if(_dateRange.Start is null)
+        if (_dateRange.Start is null)
         {
             _snakBar.Add("Please select start date.", Severity.Error);
         }
-        if(_dateRange.End is null)
+        if (_dateRange.End is null)
         {
             _snakBar.Add("Please select end date.", Severity.Error);
         }
@@ -94,8 +93,5 @@
         {
             JournalViews = _journalService.JournalSelect(_dateRange.Start, _dateRange.End);
         }
-
     }
-
-
 }

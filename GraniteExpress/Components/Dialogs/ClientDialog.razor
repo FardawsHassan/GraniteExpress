@@ -23,7 +23,7 @@
         </MudTable> *@
 
 
-        <MudDataGrid T="Client" Items="@Clients" FilterMode=DataGridFilterMode.ColumnFilterRow FilterCaseSensitivity=DataGridFilterCaseSensitivity.CaseInsensitive SortMode="SortMode.Multiple" Dense=true Filterable="true" Class="mb-5">
+        <MudDataGrid T="ClientDto" Items="@Clients" FilterMode=DataGridFilterMode.ColumnFilterRow FilterCaseSensitivity=DataGridFilterCaseSensitivity.CaseInsensitive SortMode="SortMode.Multiple" Dense=true Filterable="true" Class="mb-5">
             <Columns>
                 <PropertyColumn Property="x => x.ClientCode">
                     <CellTemplate>
@@ -48,7 +48,7 @@
                 </PropertyColumn>
             </Columns>
             <PagerContent>
-                <MudDataGridPager T="Client"/>
+                <MudDataGridPager T="ClientDto" />
             </PagerContent>
         </MudDataGrid>
     </DialogContent>
@@ -76,15 +76,15 @@
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
 
-    MudTable<Client> mudtable = new();
+    MudTable<ClientDto> mudtable = new();
 
-    List<Client> Clients = new();
-    Client SelectedClient = new();
+    List<ClientDto> Clients = new();
+    ClientDto SelectedClient = new();
 
     protected override async Task OnInitializedAsync()
     {
         Clients = await _clientService.GetClients();
     }
 
-    public void RowSelected(Client client) => MudDialog.Close(DialogResult.Ok(client));
+    public void RowSelected(ClientDto client) => MudDialog.Close(DialogResult.Ok(client));
 }

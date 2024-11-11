@@ -1,4 +1,6 @@
-﻿using GraniteExpress.Data;
+﻿using AutoMapper;
+using GraniteExpress.Data;
+using GraniteExpress.DtoModels;
 using GraniteExpress.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -7,10 +9,10 @@ namespace GraniteExpress.Services
 {
     public interface IJournalService
     {
-        Task<List<Journal>> GetJournals();
-        Task<Journal> GetJournalById(int journalId);
-        Task<List<Models.JournalView>> GetJournalViews();
-        Task<bool> SaveJournal(Journal journal);
+        Task<List<JournalDto>> GetJournals();
+        Task<JournalDto> GetJournalById(int journalId);
+        Task<List<JournalView>> GetJournalViews();
+        Task<bool> SaveJournal(JournalDto journal);
         Task<bool> DeleteJournal(int journalId);
         List<SelectJournalView> JournalSelect(DateTime? start, DateTime? end);
     }
@@ -18,24 +20,47 @@ namespace GraniteExpress.Services
     public class JournalService : IJournalService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<JournalService> _logger;
+        private readonly IMapper _mapper;
 
-        public JournalService(ApplicationDbContext context)
+        public JournalService(ApplicationDbContext context, ILogger<JournalService> logger, IMapper mapper)
         {
             _context = context;
+            _logger = logger;
+            _mapper = mapper;
         }
 
-        public async Task<List<Journal>> GetJournals()
+        public async Task<List<JournalDto>> GetJournals()
         {
-            return _context.GenJournal.Include(x => x.JournalDetail).ToList();
+            try
+            {
+                var journals = await _context.GenJournal.Include(x => x.JournalDetail).ToListAsync();
+                return _mapper.Map<List<JournalDto>>(journals);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Method->GetJournals Error->{ex.Message}");
+                return null;
+            }
         }
-        
-        public async Task<Journal> GetJournalById(int journalId)
+
+        public async Task<JournalDto> GetJournalById(int journalId)
         {
-            var journal =  _context.GenJournal.Where(j => j.JournalId == journalId).Include(x => x.JournalDetail).FirstOrDefault();
-            journal.JournalDetail.RemoveAll(x => x.JournalId == 0);
-            return journal;
+            try
+            {
+                var journal = await _context.GenJournal.Where(j => j.JournalId == journalId).Include(x => x.JournalDetail).FirstOrDefaultAsync();
+                if (journal is null) return null;
+
+                //journal.JournalDetail.RemoveAll(x => x.JournalId == 0);
+                return _mapper.Map<JournalDto>(journal);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Method->GetJounalById Error->{ex.Message}");
+                return null;
+            }
         }
-        
+
         public async Task<bool> DeleteJournal(int journalId)
         {
             try
@@ -43,69 +68,58 @@ namespace GraniteExpress.Services
                 var result = await _context.Database.ExecuteSqlAsync($"UPDATE GenJournal SET IsDelete = 1 WHERE JournalId = {journalId}");
                 return result > 0 ? true : false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError($"Method->DeleteJournal Error->{ex.Message}");
                 return false;
             }
 
         }
-        
-        public async Task<List<Models.JournalView>> GetJournalViews()
+
+        public async Task<List<JournalView>> GetJournalViews()
         {
-            var query = from journal in _context.GenJournal where journal.IsDelete == false
-                        join journalDetails in _context.GenJournalDetails on journal.JournalId equals journalDetails.JournalId
-                        join account in _context.RefAccount on journalDetails.AccountId equals account.AccountId
-                        join client in _context.RefClient on journal.ClientId equals client.ClientId
-                        join documentType in _context.RefDocumentType on journal.DocumentTypeId equals documentType.DocumentTypeId
-                        select new
-                        {
-                            journal.DocumentTypeId,
-                            journal.DocumentNo,
-                            journal.JournalId,
-                            journal.JournalDescription,
-                            journal.DocumentDate,
-                            account.AccountCode,
-                            account.IsActive,
-                            client.ClientFirstName,
-                            client.ClientLastName,
-                            journalDetails.IsDebit,
-                            journalDetails.CurrencyAmount,
-                            journalDetails.ExchangeRate,
-                            documentType.DocumentName
-                        };
-
-            var result = query.ToList();
-            List<Models.JournalView> journalViews = new();
-            foreach (var item in result)
+            try
             {
-                journalViews.Add(new Models.JournalView { 
-                    DocumentTypeId = item.DocumentTypeId,
-                    DocumentNo = item.DocumentNo,
-                    JournalDescription = item.JournalDescription,
-                    DocumentDate = item.DocumentDate,
-                    AccountCode = item.AccountCode,
-                    IsActive = item.IsActive,
-                    ClientFirstName = item.ClientFirstName,
-                    ClientLastName = item.ClientLastName,
-                    IsDebit = item.IsDebit,
-                    CurrencyAmount = item.CurrencyAmount,
-                    ExchangeRate = item.ExchangeRate,
-                    DocumentName = item.DocumentName,
-                    JournalId = item.JournalId
-                });
-            }
+                var journalViews = from journal in _context.GenJournal
+                                   where journal.IsDelete == false
+                                   join journalDetails in _context.GenJournalDetails on journal.JournalId equals journalDetails.JournalId
+                                   join account in _context.RefAccount on journalDetails.AccountId equals account.AccountId
+                                   join client in _context.RefClient on journal.ClientId equals client.ClientId
+                                   join documentType in _context.RefDocumentType on journal.DocumentTypeId equals documentType.DocumentTypeId
+                                   select new JournalView
+                                   {
+                                       DocumentTypeId = journal.DocumentTypeId,
+                                       DocumentNo = journal.DocumentNo,
+                                       JournalId = journal.JournalId,
+                                       JournalDescription = journal.JournalDescription,
+                                       DocumentDate = journal.DocumentDate,
+                                       AccountCode = account.AccountCode,
+                                       IsActive = account.IsActive,
+                                       ClientFirstName = client.ClientFirstName,
+                                       ClientLastName = client.ClientLastName,
+                                       IsDebit = journalDetails.IsDebit,
+                                       CurrencyAmount = journalDetails.CurrencyAmount,
+                                       ExchangeRate = journalDetails.ExchangeRate,
+                                       DocumentName = documentType.DocumentName
+                                   };
+                return journalViews.ToList();
 
-            return journalViews;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Method->GetJournalViews Error->{ex.Message}");
+                return null;
+            }
         }
 
-        public async Task<bool> SaveJournal(Journal journal)
+        public async Task<bool> SaveJournal(JournalDto journal)
         {
             try
             {
                 var result = _context.GenJournal.Where(x => x.JournalId == journal.JournalId).FirstOrDefault();
                 if (result is null)
                 {
-                    List<Journal> list;
+                    List<JournalDto> list;
                     string sql = string.Empty;
                     if (journal.TemplateId is null)
                     {
@@ -127,16 +141,16 @@ namespace GraniteExpress.Services
                         new SqlParameter { ParameterName = "@DocumentDate", Value = journal.DocumentDate },
                         new SqlParameter { ParameterName = "@UserId", Value = journal.UserId },
                     };
-                    if(journal.TemplateId is not null)
+                    if (journal.TemplateId is not null)
                     {
                         journalParams.Add(new SqlParameter { ParameterName = "@TemplateId", Value = journal.TemplateId });
                     }
 
-                    var responese = _context.Database.SqlQueryRaw<Journal>(sql, journalParams.ToArray()).ToList();
+                    var responese = _context.Database.SqlQueryRaw<JournalDto>(sql, journalParams.ToArray()).ToList();
 
 
                     var journalDetails = journal.JournalDetail;
-                    foreach(var item in journalDetails)
+                    foreach (var item in journalDetails)
                     {
                         item.JournalId = responese.FirstOrDefault().JournalId;
                         var queryResult = await _context.Database.ExecuteSqlAsync($"INSERT INTO GenJournalDetails (JournalId,AccountId,IsDebit,ClientId,CurrencyAmount,ExchangeRate,CashFlowId) VALUES ({item.JournalId} ,{item.AccountId},{item.IsDebit},{item.ClientId},{item.CurrencyAmount},{item.ExchangeRate},{item.CashFlowId})");
@@ -146,13 +160,10 @@ namespace GraniteExpress.Services
                 else
                 {
                     var queryResult = await _context.Database.ExecuteSqlAsync($"UPDATE GenJournal SET IsDelete = {journal.IsDelete}, JournalDescription = {journal.JournalDescription}, DocumentTypeId = {journal.DocumentTypeId}, ClientId = {journal.ClientId}, DocumentNo = {journal.DocumentNo}, TemplateId = {journal.TemplateId} WHERE JournalId = {journal.JournalId}");
-                    if(queryResult == 0)
-                    {
-                        return false;
-                    }
+                    if (queryResult == 0) return false;
 
                     var journalDetails = _context.GenJournalDetails.Where(x => x.JournalId == journal.JournalId);
-                    foreach(var item in journalDetails)
+                    foreach (var item in journalDetails)
                     {
                         var updateJournal = journal.JournalDetail.Where(x => x.JournalDetailId == item.JournalDetailId).FirstOrDefault();
                         if (updateJournal is not null)
@@ -166,9 +177,9 @@ namespace GraniteExpress.Services
                     }
 
                     List<JournalDetail> newJournals = new();
-                    foreach(var item in journal.JournalDetail)
+                    foreach (var item in journal.JournalDetail)
                     {
-                        if(!journalDetails.Any(x => x.JournalDetailId == item.JournalDetailId))
+                        if (!journalDetails.Any(x => x.JournalDetailId == item.JournalDetailId))
                         {
                             item.JournalId = journal.JournalId;
                             queryResult = await _context.Database.ExecuteSqlAsync($"INSERT INTO GenJournalDetails (JournalId,AccountId,IsDebit,ClientId,CurrencyAmount,ExchangeRate,CashFlowId) VALUES ({item.JournalId} ,{item.AccountId},{item.IsDebit},{item.ClientId},{item.CurrencyAmount},{item.ExchangeRate},{item.CashFlowId})");
@@ -177,8 +188,9 @@ namespace GraniteExpress.Services
                     return true;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError($"Method->SaveJournal Error->{ex.Message}");
                 return false;
             }
         }
@@ -195,23 +207,17 @@ namespace GraniteExpress.Services
 
                 List<SqlParameter> parms = new List<SqlParameter>
                 {
-                    // Create parameter(s)    
                     new SqlParameter { ParameterName = "@edate", Value = end },
                     new SqlParameter { ParameterName = "@bdate", Value = start }
                 };
 
                 return _context.Database.SqlQueryRaw<SelectJournalView>(sql, parms.ToArray()).ToList();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                return new();
+                _logger.LogError($"Method->JournalSelect Error->{ex.Message}");
+                return null;
             }
         }
-    }
-
-    class GetJournalId
-    {
-        int JournalId { get; set; }
     }
 }

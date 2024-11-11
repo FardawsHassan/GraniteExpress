@@ -2,11 +2,10 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace GraniteExpress.Models
+namespace GraniteExpress.DtoModels
 {
-    public class Currency
+    public class CurrencyDto
     {
-        [Key]
         public int CurrencyId { get; set; }
         [Required]
         public string CurrencyCode { get; set; }
@@ -14,6 +13,6 @@ namespace GraniteExpress.Models
         [DefaultValue(1)]
         public decimal? DefaultValue { get; set; }
 
-        public virtual List<Account> Accounts { get; set; }
+        public virtual List<AccountDto> Accounts { get; set; }
     }
 }

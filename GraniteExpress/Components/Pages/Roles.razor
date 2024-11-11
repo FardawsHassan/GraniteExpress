@@ -1,13 +1,11 @@
 ﻿@page "/roles"
 @using Microsoft.AspNetCore.Identity
 @inject IUserService _userService
-
 @attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Roles</PageTitle>
 
 <MudText Typo="Typo.h5" Class="mb-5">Roles</MudText>
-
 <MudGrid>
     <MudItem xs="12" Style="float: right;" Class="mr-1">
         <MudButton Color="Color.Primary" Style="float: right;" Variant="Variant.Filled" OnClick="OpenAddRoleDialog">Add Role</MudButton>

@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GraniteExpress.Models
+namespace GraniteExpress.DtoModels
 {
-    public class TemplateDetails
+    public class TemplateDetailsDto
     {
-        [Key]
         public int TemplateDetailsId { get; set; }
         public int? TemplateId { get; set; }
         [Required]
@@ -12,7 +11,8 @@ namespace GraniteExpress.Models
         [Required]
         public bool IsDebit{ get; set; }
 
-        public virtual Template Template { get; set; }
-        public virtual Account Account { get; set; }
+
+        public virtual TemplateDto Template { get; set; }
+        public virtual AccountDto Account { get; set; }
     }
 }

@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GraniteExpress.Models
+namespace GraniteExpress.DtoModels
 {
-    public class DocumentType
-
+    public class DocumentTypeDto
     {
-        [Key]
         public int DocumentTypeId { get; set; }
         [Required]
         public string DocumentName { get; set; }
@@ -14,6 +12,6 @@ namespace GraniteExpress.Models
         [Required]
         public int DocumentMaxValue { get; set; }
 
-        public virtual List<Journal> Journals { get; set; }
+        public virtual List<JournalDto> Journals { get; set; }
     }
 }

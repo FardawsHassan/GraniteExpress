@@ -229,19 +229,19 @@
     [Parameter]
     public int EditJournalId { get; set; } = 0;
 
-    public List<Journal> JournalList = new List<Journal>();
+    public List<JournalDto> JournalList = new List<JournalDto>();
     private DialogOptions _dialogOption = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true, CloseButton = true };
 
-    public Journal Journal { get; set; } = new();
-    public Account SelectedAccount { get; set; } = new();
+    public JournalDto Journal { get; set; } = new();
+    public AccountDto SelectedAccount { get; set; } = new();
 
-    List<DocumentType> DocumentTypes = new();
-    List<Template> Templates = new();
-    List<Account> Accounts = new();
-    List<Client> Clients = new();
-    List<Currency> Currencies = new();
+    List<DocumentTypeDto> DocumentTypes = new();
+    List<TemplateDto> Templates = new();
+    List<AccountDto> Accounts = new();
+    List<ClientDto> Clients = new();
+    List<CurrencyDto> Currencies = new();
 
-    MudTable<JournalDetail> JournalDetailTable = new();
+    MudTable<JournalDetailDto> JournalDetailTable = new();
     public DateTime? journalDate = DateTime.UtcNow;
     bool clientError = false;
     bool templateError = false;
@@ -337,14 +337,14 @@
     //     AddEditionEvent($"RowEditCommit event: Changes to Element {((Element)element).Name} committed");
     // }
 
-    private async Task OpenAccountSelectDialog(JournalDetail journalDetail)
+    private async Task OpenAccountSelectDialog(JournalDetailDto journalDetail)
     {
         var dialog = _dialog.Show<AccountDialog>("Select Account", _dialogOption);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
-            var account = result.Data as Account;
+            var account = result.Data as AccountDto;
             JournalDetailTable.SelectedItem.AccountId = account.AccountId;
 
             if (journalDetail == Journal.JournalDetail.Last())
@@ -356,7 +356,7 @@
 
     }
 
-    private async Task OnEnterOpenAccountDialog(JournalDetail journalDetail, KeyboardEventArgs e)
+    private async Task OnEnterOpenAccountDialog(JournalDetailDto journalDetail, KeyboardEventArgs e)
     {
         if (e.Code == "Enter" || e.Code == "NumpadEnter")
         {
@@ -365,7 +365,7 @@
 
             if (!result.Canceled)
             {
-                var account = result.Data as Account;
+                var account = result.Data as AccountDto;
                 JournalDetailTable.SelectedItem.AccountId = account.AccountId;
 
                 if (journalDetail == Journal.JournalDetail.Last())
@@ -386,21 +386,21 @@
 
             if (!result.Canceled)
             {
-                var client = result.Data as Client;
+                var client = result.Data as ClientDto;
                 JournalDetailTable.SelectedItem.ClientId = client.ClientId;
                 StateHasChanged();
             }
         }
     }
 
-    private async Task OpenClientSelectDialog(JournalDetail journalDetail)
+    private async Task OpenClientSelectDialog(JournalDetailDto journalDetail)
     {
         var dialog = _dialog.Show<ClientDialog>("Select Client", _dialogOption);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
-            var client = result.Data as Client;
+            var client = result.Data as ClientDto;
             JournalDetailTable.SelectedItem.ClientId = client.ClientId;
         }
         StateHasChanged();
@@ -413,7 +413,7 @@
 
         if (!result.Canceled)
         {
-            var client = result.Data as Client;
+            var client = result.Data as ClientDto;
             Journal.ClientId = client.ClientId;
             clientError = false;
         }
@@ -428,7 +428,7 @@
 
         if (!result.Canceled)
         {
-            var documentType = result.Data as DocumentType;
+            var documentType = result.Data as DocumentTypeDto;
             Journal.DocumentTypeId = documentType.DocumentTypeId;
             documentTypeError = false;
         }
@@ -442,11 +442,11 @@
 
         if (!result.Canceled)
         {
-            var template = result.Data as Template;
+            var template = result.Data as TemplateDto;
             Journal.TemplateId = template.TemplateId;
             var lastJournalDetail = Journal.JournalDetail.Last();
             Journal.JournalDetail.Remove(lastJournalDetail);
-            Journal.JournalDetail.AddRange(template.TemplateDetail.Select(x => new JournalDetail
+            Journal.JournalDetail.AddRange(template.TemplateDetail.Select(x => new JournalDetailDto
                 {
                     AccountId = x.AccountId,
                     IsDebit = x.IsDebit
@@ -466,7 +466,7 @@
         // lastRow.AccountId = template.TemplateDetail.FirstOrDefault().
     }
 
-    private void RemoveRow(JournalDetail journalDetail)
+    private void RemoveRow(JournalDetailDto journalDetail)
     {
         Journal.JournalDetail.Remove(journalDetail);
     }

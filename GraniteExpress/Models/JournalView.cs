@@ -1,8 +1,4 @@
-﻿using GraniteExpress.Models;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-
-namespace GraniteExpress.Models
+﻿namespace GraniteExpress.Models
 {
     public class JournalView
     {

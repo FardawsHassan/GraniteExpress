@@ -1,13 +1,11 @@
 ﻿@page "/claims"
 @using Microsoft.AspNetCore.Identity
 @inject IUserService _userService
-
 @attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Claims</PageTitle>
 
 <MudText Typo="Typo.h5" Class="mb-5">Claims</MudText>
-
 <MudGrid>
     <MudItem xs="12">
         <MudTable Items="roles" >

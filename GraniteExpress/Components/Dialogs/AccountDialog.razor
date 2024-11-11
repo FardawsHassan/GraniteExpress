@@ -2,7 +2,7 @@
 
 <MudDialog>
     <DialogContent>
-        <MudDataGrid T="Account" Items="@Accounts" FilterMode=DataGridFilterMode.ColumnFilterRow  FilterCaseSensitivity=DataGridFilterCaseSensitivity.CaseInsensitive SortMode="SortMode.Multiple" Dense=true Filterable="true" Class="mb-5">
+        <MudDataGrid T="AccountDto" Items="@Accounts" FilterMode=DataGridFilterMode.ColumnFilterRow  FilterCaseSensitivity=DataGridFilterCaseSensitivity.CaseInsensitive SortMode="SortMode.Multiple" Dense=true Filterable="true" Class="mb-5">
             <Columns>
                 <PropertyColumn Property="x => x.AccountCode" Title="Code">
                     <CellTemplate>
@@ -44,15 +44,15 @@
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
 
-    MudTable<Account> _mudTable = new();
-    List<Account> Accounts = new();
+    MudTable<AccountDto> _mudTable = new();
+    List<AccountDto> Accounts = new();
 
     protected override async Task OnInitializedAsync()
     {
         Accounts = await _accountService.GetAccounts();
     }
 
-    public void RowSelected(Account account)
+    public void RowSelected(AccountDto account)
     {
         MudDialog.Close(DialogResult.Ok(account));
     }

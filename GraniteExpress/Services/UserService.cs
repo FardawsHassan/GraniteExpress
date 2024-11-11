@@ -31,8 +31,6 @@ namespace GraniteExpress.Services
             _roleManager = roleManager;
         }
 
-
-
         public async Task<UserDto> AddUser(AddUserRequest registerRequest)
         {
             try
@@ -52,7 +50,7 @@ namespace GraniteExpress.Services
                     NormalizedEmail = registerRequest.Email,
                     NormalizedUserName = registerRequest.Email,
                     SecurityStamp = Guid.NewGuid().ToString(),
-                    EmailConfirmed = true,
+                    EmailConfirmed = false,
                 };
 
 

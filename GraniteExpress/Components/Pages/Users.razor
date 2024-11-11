@@ -1,13 +1,10 @@
 ﻿@page "/users"
-@using Microsoft.AspNetCore.Identity
 @inject IUserService _userService
-
 @attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Users</PageTitle>
 
 <MudText Typo="Typo.h5" Class="mb-5">Users</MudText>
-
 <MudGrid>
     <MudItem xs="12" Style="float: right;" Class="mr-1">
         <MudButton Color="Color.Primary" Style="float: right;" Variant="Variant.Filled" OnClick="OpenAddUserDialog">Add Users</MudButton>

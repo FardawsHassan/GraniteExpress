@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GraniteExpress.Models
+namespace GraniteExpress.DtoModels
 {
-    public class CashFlow
+    public class CashFlowDto
     {
-        [Key]
         public int CashFlowId { get; set; }
         public int? OrderId { get; set; }
         [Required]
@@ -13,6 +12,6 @@ namespace GraniteExpress.Models
         [Required]
         public bool IsVisible { get; set; } = false;
 
-        public virtual List<JournalDetail> JournalDetails { get; set; }
+        public virtual List<JournalDetailDto> JournalDetails { get; set; }
     }
 }
