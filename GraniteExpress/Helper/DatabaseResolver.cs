@@ -25,7 +25,7 @@ namespace TeamWorkServer.Services
                 connectionString += $"Password={AppSettings.Settings.DatabasePassword};";
             }
 
-            connectionString += "Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
+            connectionString += "Trusted_Connection=False;MultipleActiveResultSets=true;TrustServerCertificate=True";
             return connectionString;
         }
     }

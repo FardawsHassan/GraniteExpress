@@ -48,7 +48,7 @@
     public class Settings
     {
         // Database Information
-        public string ServerName { get; set; } = "sql.bsite.net\MSSQL2016";
+        public string ServerName { get; set; } = "sql.bsite.net\\MSSQL2016";
         public string DatabaseUserId { get; set; } = "shuvropust18_";
         public string DatabasePassword { get; set; } = "shuvropust18";
 
