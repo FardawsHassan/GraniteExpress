@@ -37,19 +37,20 @@
 
         public static Dictionary<string, string> Databases = new()
         {
-            ["GraniteExpress1"] = "Primary Database",
-            ["GraniteExpress2"] = "Backup Database",
-            ["GraniteExpress3"] = "Database 1",
-            ["GraniteExpress4"] = "Database 2",
+            // ["GraniteExpress1"] = "Primary Database",
+            // ["GraniteExpress2"] = "Backup Database",
+            // ["GraniteExpress3"] = "Database 1",
+            // ["GraniteExpress4"] = "Database 2",
+            ["shuvropust18_"] = "Database 2",
         };
     }
 
     public class Settings
     {
         // Database Information
-        public string ServerName { get; set; } = "(localdb)\\MSSQLLocalDB";
-        public string DatabaseUserId { get; set; } = "";
-        public string DatabasePassword { get; set; } = "";
+        public string ServerName { get; set; } = "sql.bsite.net\MSSQL2016";
+        public string DatabaseUserId { get; set; } = "shuvropust18_";
+        public string DatabasePassword { get; set; } = "shuvropust18";
 
         // Email Setitngs
         public string AppUrl { get; set; } = "https://localhost:7054";
