@@ -18,7 +18,8 @@ namespace TeamWorkServer.Services
             string connectionString = $"Server={AppSettings.Settings.ServerName};Database={databaseName};";
             if (!string.IsNullOrEmpty(AppSettings.Settings.DatabaseUserId))
             {
-                connectionString += $"User Id={AppSettings.Settings.DatabaseUserId};";
+                connectionString += $"User Id={databaseName};";
+                //connectionString += $"User Id={AppSettings.Settings.DatabaseUserId};";
             }
             if (!string.IsNullOrEmpty(AppSettings.Settings.DatabasePassword))
             {

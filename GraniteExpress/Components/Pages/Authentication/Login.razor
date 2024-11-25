@@ -5,9 +5,10 @@
 @inject IAuthenticationService _authService
 @inject IUserService _userService
 @inject NavigationManager _navigationManager
+<PageTitle>Log In</PageTitle>
 
 <MudGrid Justify="Justify.Center">
-    <MudPaper Class="d-flex flex-column gap-3 mx-4 mt-10" Square=false Style="min-height: 60vh;align-content: center;justify-content: center;padding: 100px 85px;">
+    <MudPaper Class="d-flex flex-column gap-3 mx-4 mt-4" Square=false Style="min-height: 60vh;align-content: center;justify-content: center;padding: 100px 85px 40px 85px;">
         <MudText Style="font-size: 38px;font-weight: 500;text-align: center;" Typo="Typo.h3" Class="mb-7">Log In</MudText>
         <EditForm Model="@_login" OnValidSubmit="Submit" Enhance>
             <DataAnnotationsValidator />
@@ -18,7 +19,6 @@
                     @foreach (var database in AppSettings.Databases)
                     {
                         <MudSelectItem Value="@database.Key">@database.Value</MudSelectItem>
-
                     }
                 </MudSelect>
                 @if (_errorMessage.Any())
@@ -33,6 +33,11 @@
                 </MudItem>
                 <MudItem Class="d-flex justify-content-center">
                     <MudButton Style="text-align: center;padding: 37px;margin-top: 18px !important;" Color="Color.Primary" Class="py-2 mt-1" Variant="Variant.Filled" ButtonType="ButtonType.Submit"><MudText Typo="Typo.body2">Login</MudText></MudButton>
+                </MudItem>
+                <MudItem Class="mt-10" Style="opacity: .65">
+                    <MudText Align="Align.Center" Style="font-size: 12px">Email: <span style="color: cadetblue">@AppSettings.Settings.AdminEmail</span></MudText>
+                    <MudText Align="Align.Center" Style="font-size: 12px">Password: <span style="color: cadetblue">@AppSettings.Settings.AdminPassword</span></MudText>
+                    <MudText Align="Align.Center" Style="font-size: 12px" Class="mt-3">Created Users Default Password: <span style='color: cadetblue'>@("user123@")</span></MudText>
                 </MudItem>
             </MudItem>
         </EditForm>
