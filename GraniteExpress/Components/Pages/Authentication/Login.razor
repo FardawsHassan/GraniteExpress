@@ -15,7 +15,7 @@
             <MudItem>
                 <MudTextField Class="pb-5" @bind-Value="_login.Email" Immediate="true" Label="Email" Variant="Variant.Outlined" Margin="Margin.Dense" For="() => _login.Email" />
                 <MudTextField Class="pb-4" @bind-Value="_login.Password" Immediate="true" Label="Password" Margin="Margin.Dense" Variant="Variant.Outlined" InputType="@Password" Adornment="Adornment.End" AdornmentIcon="@PasswordIcon" OnAdornmentClick="ShowPassword" AdornmentAriaLabel="Show Password" For="() => _login.Password" />
-                <MudSelect Margin="Margin.Dense" Class="pb-4" Placeholder="Select Database" @bind-Value="Database" Required Variant="Variant.Outlined">
+                <MudSelect Margin="Margin.Dense" Class="pb-4" Placeholder="Select Database" @bind-Value="Database" AnchorOrigin="Origin.BottomCenter" Required Variant="Variant.Outlined">
                     @foreach (var database in AppSettings.Databases)
                     {
                         <MudSelectItem Value="@database.Key">@database.Value</MudSelectItem>

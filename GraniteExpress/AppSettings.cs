@@ -41,7 +41,8 @@
             // ["GraniteExpress2"] = "Backup Database",
             // ["GraniteExpress3"] = "Database 1",
             // ["GraniteExpress4"] = "Database 2",
-            ["shuvropust18_"] = "Database 2",
+            ["shuvropust18_"] = "Primary Database",
+            ["fardawshassan_"] = "Backup Database",
         };
     }
 
